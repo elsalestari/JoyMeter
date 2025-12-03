@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
-@section('page-title', 'Dashboard')
+@section('title', 'Kepuasan Pelanggan')
+@section('page-title', 'Kepuasan Pelanggan')
 
 @section('content')
-    <!-- Filter Waktu -->
+    <!-- Filter Waktu & Export -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <form method="GET" action="{{ route('dashboard') }}" class="flex items-end gap-4">
+        <form method="GET" action="{{ route('customer-satisfaction.index') }}" class="flex flex-col md:flex-row md:items-end gap-4">
             <div class="flex-1">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Rentang Waktu (Opsional)</label>
-                <p class="text-xs text-gray-500 mb-3">Kosongkan untuk menampilkan semua data</p>
-                <div class="grid grid-cols-2 gap-4">
+                <p class="text-xs text-gray-500 mb-3">Kosongkan untuk menampilkan semua data rekaman kamera</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Tanggal Mulai</label>
                         <input type="date" name="start_date" value="{{ $startDate ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#F7AA4A]">
@@ -21,90 +21,31 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col gap-2">
-                <button type="submit" class="px-6 py-2 bg-[#F7AA4A] text-white rounded-md hover:bg-[#F6821F] transition-colors text-sm font-medium">
+            <div class="flex flex-col gap-2 md:w-56">
+                <button type="submit" class="px-6 py-2 bg-[#F7AA4A] text-white rounded-md hover:bg-[#F6821F] transition-colors text-sm font-medium w-full">
                     Terapkan Filter
                 </button>
                 @if($startDate || $endDate)
-                <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium text-center">
+                <a href="{{ route('customer-satisfaction.index') }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium text-center">
                     Tampilkan Semua
                 </a>
                 @endif
+                <a href="{{ route('customer-satisfaction.export-pdf', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm font-medium text-center">
+                    Export PDF
+                </a>
             </div>
         </form>
+
         @if(!$startDate && !$endDate)
         <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <p class="text-sm text-blue-800">
-                <span class="font-medium">Menampilkan semua data</span> - Gunakan filter di atas untuk membatasi rentang waktu
+                <span class="font-medium">Menampilkan semua data kepuasan pelanggan</span> berdasarkan hasil rekaman kamera.
             </p>
         </div>
         @endif
     </div>
 
-    <!-- Ringkasan Data Penting -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <!-- Total Pelanggan -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Total Pelanggan</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_customers']) }}</p>
-                </div>
-                <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Persentase Senang -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Tingkat Kepuasan</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['senang_rate'], 1) }}%</p>
-                    <p class="text-xs text-gray-500 mt-1">Pelanggan Senang</p>
-                </div>
-                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pelanggan Hari Ini -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Pelanggan Hari Ini</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $stats['customers_today'] }}</p>
-                </div>
-                <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ekspresi Dominan -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Ekspresi Dominan</p>
-                    <p class="text-xl font-bold text-gray-900">{{ $dominantExpression['emotion_label'] ?? ucfirst($dominantExpression['emotion']) }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ $dominantExpression['percentage'] }}% ({{ $dominantExpression['count'] }} pelanggan)</p>
-                </div>
-                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-2xl">
-                    {{ $dominantExpression['emotion_emoji'] ?? '😐' }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Kategori Kepuasan -->
+    <!-- Ringkasan Kategori Kepuasan -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Senang -->
         <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-sm border border-green-200 p-6">
@@ -114,7 +55,7 @@
             </div>
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-green-700">Total</span>
+                    <span class="text-sm text-green-700">Total Pelanggan</span>
                     <span class="text-2xl font-bold text-green-900">{{ number_format($stats['senang_count']) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
@@ -132,7 +73,7 @@
             </div>
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-yellow-700">Total</span>
+                    <span class="text-sm text-yellow-700">Total Pelanggan</span>
                     <span class="text-2xl font-bold text-yellow-900">{{ number_format($stats['netral_count']) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
@@ -150,7 +91,7 @@
             </div>
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-red-700">Total</span>
+                    <span class="text-sm text-red-700">Total Pelanggan</span>
                     <span class="text-2xl font-bold text-red-900">{{ number_format($stats['tidak_puas_count']) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
@@ -161,11 +102,11 @@
         </div>
     </div>
 
-    <!-- Grafik -->
+    <!-- Grafik Kepuasan -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Grafik Tren Kepuasan -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h3 class="text-base font-semibold text-gray-900 mb-3">Tren Kepuasan</h3>
+            <h3 class="text-base font-semibold text-gray-900 mb-3">Tren Kepuasan (Pelanggan Senang)</h3>
             <div class="h-64">
                 <canvas id="satisfactionTrendChart"></canvas>
             </div>
@@ -180,117 +121,59 @@
         </div>
     </div>
 
-    <!-- Tabel Riwayat Kepuasan Pelanggan per Bulan -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <!-- Tabel Riwayat Kepuasan per Hari (maksimal 20 hari terakhir) -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Riwayat Kepuasan Pelanggan per Bulan</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Riwayat Kepuasan Pelanggan per Hari</h3>
         </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bulan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pelanggan</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Senang</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Netral</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Tidak Puas</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Tingkat Kepuasan</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($monthlyHistory as $month)
+                    @forelse($dailyHistory as $day)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-medium text-gray-900">{{ $month['month'] }}</span>
+                            <span class="text-sm font-medium text-gray-900">{{ $day['date'] }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="text-sm font-semibold text-gray-900">{{ number_format($month['total']) }}</span>
+                            <span class="text-sm font-semibold text-gray-900">{{ number_format($day['total']) }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {{ number_format($month['senang']) }}
+                                {{ number_format($day['senang']) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                {{ number_format($month['netral']) }}
+                                {{ number_format($day['netral']) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                {{ number_format($month['tidak_puas']) }}
+                                {{ number_format($day['tidak_puas']) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-bold text-gray-900">{{ number_format($month['senang_rate'], 1) }}%</span>
+                                <span class="text-sm font-bold text-gray-900">{{ number_format($day['senang_rate'], 1) }}%</span>
                                 <span class="text-xs text-gray-500">Pelanggan Senang</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <a href="{{ route('customer-satisfaction.index', ['start_date' => $month['start_date'], 'end_date' => $month['end_date']]) }}"
-                               class="inline-flex items-center px-3 py-1.5 border border-[#F7AA4A] text-xs font-medium rounded-full text-[#F7AA4A] bg-white hover:bg-[#FAEF9F]">
-                                Lihat
-                            </a>
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Belum ada data kepuasan pelanggan
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Tabel Aktivitas Staff -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Aktivitas Staff</h3>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Staff</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktivitas Terakhir</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($staffActivities as $staff)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#F7AA4A] to-[#F6821F] flex items-center justify-center text-white font-semibold mr-3">
-                                    {{ strtoupper(substr($staff->name, 0, 1)) }}
-                                </div>
-                                <span class="text-sm font-medium text-gray-900">{{ $staff->name }}</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $staff->email }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
-                                {{ $staff->role }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $staff->updated_at->format('d M Y, H:i') }}
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Belum ada data staff
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Belum ada data kepuasan pelanggan dari rekaman kamera.
                         </td>
                     </tr>
                     @endforelse
@@ -394,3 +277,5 @@
     });
 </script>
 @endpush
+
+
