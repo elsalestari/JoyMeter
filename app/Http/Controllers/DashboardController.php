@@ -58,7 +58,7 @@ class DashboardController extends Controller
         $query = CustomerExpression::query();
         
         if ($startDate && $endDate) {
-            $query->whereBetween('detected_at', [
+            $query->whereBetween('ended_at', [
                 Carbon::parse($startDate)->startOfDay(),
                 Carbon::parse($endDate)->endOfDay()
             ]);
@@ -66,15 +66,12 @@ class DashboardController extends Controller
 
         $total = $query->count();
         
-        $today = CustomerExpression::whereDate('detected_at', today())->count();
+        $today = CustomerExpression::whereDate('ended_at', today())->count();
         
-        $senangEmotions = CustomerExpression::getEmotionsByCategory('senang');
-        $netralEmotions = CustomerExpression::getEmotionsByCategory('netral');
-        $tidakPuasEmotions = CustomerExpression::getEmotionsByCategory('tidak puas');
-        
-        $senang = (clone $query)->whereIn('emotion', $senangEmotions)->count();
-        $netral = (clone $query)->whereIn('emotion', $netralEmotions)->count();
-        $tidakPuas = (clone $query)->whereIn('emotion', $tidakPuasEmotions)->count();
+        // Kategori berdasarkan nilai satisfaction (0-100)
+        $senang = (clone $query)->where('satisfaction', '>=', 70)->count();
+        $netral = (clone $query)->whereBetween('satisfaction', [40, 69])->count();
+        $tidakPuas = (clone $query)->where('satisfaction', '<', 40)->count();
 
         $senangRate = $total > 0 ? ($senang / $total) * 100 : 0;
         $netralRate = $total > 0 ? ($netral / $total) * 100 : 0;
@@ -111,11 +108,10 @@ class DashboardController extends Controller
                 while ($current <= $end) {
                     $labels[] = $current->format('M Y');
                     
-                    $monthQuery = CustomerExpression::whereYear('detected_at', $current->year)
-                        ->whereMonth('detected_at', $current->month);
+                    $monthQuery = CustomerExpression::whereYear('ended_at', $current->year)
+                        ->whereMonth('ended_at', $current->month);
                     $total = $monthQuery->count();
-                    $senangEmotions = CustomerExpression::getEmotionsByCategory('senang');
-                    $senang = $monthQuery->whereIn('emotion', $senangEmotions)->count();
+                    $senang = $monthQuery->where('satisfaction', '>=', 70)->count();
                     
                     $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
                     $current->addMonth();
@@ -125,31 +121,29 @@ class DashboardController extends Controller
                 while ($current <= $end) {
                     $labels[] = $current->format('d M');
                     
-                    $dayQuery = CustomerExpression::whereDate('detected_at', $current->toDateString());
+                    $dayQuery = CustomerExpression::whereDate('ended_at', $current->toDateString());
                     $total = $dayQuery->count();
-                    $senangEmotions = CustomerExpression::getEmotionsByCategory('senang');
-                    $senang = $dayQuery->whereIn('emotion', $senangEmotions)->count();
+                    $senang = $dayQuery->where('satisfaction', '>=', 70)->count();
                     
                     $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
                     $current->addDay();
                 }
             }
         } else {
-            $firstRecord = CustomerExpression::orderBy('detected_at', 'asc')->first();
+            $firstRecord = CustomerExpression::orderBy('ended_at', 'asc')->first();
             
             if ($firstRecord) {
-                $start = Carbon::parse($firstRecord->detected_at)->startOfMonth();
+                $start = Carbon::parse($firstRecord->ended_at ?? $firstRecord->created_at)->startOfMonth();
                 $end = Carbon::now()->endOfMonth();
                 
                 $current = $start->copy();
                 while ($current <= $end) {
                     $labels[] = $current->format('M Y');
                     
-                    $monthQuery = CustomerExpression::whereYear('detected_at', $current->year)
-                        ->whereMonth('detected_at', $current->month);
+                    $monthQuery = CustomerExpression::whereYear('ended_at', $current->year)
+                        ->whereMonth('ended_at', $current->month);
                     $total = $monthQuery->count();
-                    $senangEmotions = CustomerExpression::getEmotionsByCategory('senang');
-                    $senang = $monthQuery->whereIn('emotion', $senangEmotions)->count();
+                    $senang = $monthQuery->where('satisfaction', '>=', 70)->count();
                     
                     $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
                     $current->addMonth();
@@ -171,7 +165,7 @@ class DashboardController extends Controller
         $query = CustomerExpression::query();
         
         if ($startDate && $endDate) {
-            $query->whereBetween('detected_at', [
+            $query->whereBetween('ended_at', [
                 Carbon::parse($startDate)->startOfDay(),
                 Carbon::parse($endDate)->endOfDay()
             ]);
@@ -186,13 +180,9 @@ class DashboardController extends Controller
             ];
         }
 
-        $senangEmotions = CustomerExpression::getEmotionsByCategory('senang');
-        $netralEmotions = CustomerExpression::getEmotionsByCategory('netral');
-        $tidakPuasEmotions = CustomerExpression::getEmotionsByCategory('tidak puas');
-        
-        $senang = (clone $query)->whereIn('emotion', $senangEmotions)->count();
-        $netral = (clone $query)->whereIn('emotion', $netralEmotions)->count();
-        $tidakPuas = (clone $query)->whereIn('emotion', $tidakPuasEmotions)->count();
+        $senang = (clone $query)->where('satisfaction', '>=', 70)->count();
+        $netral = (clone $query)->whereBetween('satisfaction', [40, 69])->count();
+        $tidakPuas = (clone $query)->where('satisfaction', '<', 40)->count();
 
         return [
             'labels' => ['Senang', 'Netral', 'Tidak Puas'],
@@ -212,15 +202,15 @@ class DashboardController extends Controller
         $query = CustomerExpression::query();
         
         if ($startDate && $endDate) {
-            $query->whereBetween('detected_at', [
+            $query->whereBetween('ended_at', [
                 Carbon::parse($startDate)->startOfDay(),
                 Carbon::parse($endDate)->endOfDay()
             ]);
         }
         
         $expressionCounts = (clone $query)
-            ->select('emotion', DB::raw('count(*) as count'))
-            ->groupBy('emotion')
+            ->select('dominant_emotion', DB::raw('count(*) as count'))
+            ->groupBy('dominant_emotion')
             ->orderBy('count', 'desc')
             ->first();
 
@@ -236,10 +226,10 @@ class DashboardController extends Controller
 
         $total = $query->count();
         
-        $tempExpression = new CustomerExpression(['emotion' => $expressionCounts->emotion]);
+        $tempExpression = new CustomerExpression(['dominant_emotion' => $expressionCounts->dominant_emotion]);
 
         return [
-            'emotion' => $expressionCounts->emotion,
+            'emotion' => $expressionCounts->dominant_emotion,
             'emotion_label' => $tempExpression->emotion_label,
             'emotion_emoji' => $tempExpression->emotion_emoji,
             'count' => $expressionCounts->count,
@@ -259,13 +249,13 @@ class DashboardController extends Controller
             $start = Carbon::parse($startDate)->startOfMonth();
             $end = Carbon::parse($endDate)->endOfMonth();
         } else {
-            $firstRecord = CustomerExpression::orderBy('detected_at', 'asc')->first();
+            $firstRecord = CustomerExpression::orderBy('ended_at', 'asc')->first();
             
             if (!$firstRecord) {
                 return [];
             }
             
-            $start = Carbon::parse($firstRecord->detected_at)->startOfMonth();
+            $start = Carbon::parse($firstRecord->ended_at ?? $firstRecord->created_at)->startOfMonth();
             $end = Carbon::now()->endOfMonth();
         }
         
@@ -275,19 +265,15 @@ class DashboardController extends Controller
             $monthStart = $current->copy()->startOfMonth();
             $monthEnd = $current->copy()->endOfMonth();
             
-            $query = CustomerExpression::whereBetween('detected_at', [
+            $query = CustomerExpression::whereBetween('ended_at', [
                 $monthStart,
                 $monthEnd
             ]);
 
             $total = $query->count();
-            $senangEmotions = CustomerExpression::getEmotionsByCategory('senang');
-            $netralEmotions = CustomerExpression::getEmotionsByCategory('netral');
-            $tidakPuasEmotions = CustomerExpression::getEmotionsByCategory('tidak puas');
-            
-            $senang = $query->whereIn('emotion', $senangEmotions)->count();
-            $netral = $query->whereIn('emotion', $netralEmotions)->count();
-            $tidakPuas = $query->whereIn('emotion', $tidakPuasEmotions)->count();
+            $senang = $query->where('satisfaction', '>=', 70)->count();
+            $netral = $query->whereBetween('satisfaction', [40, 69])->count();
+            $tidakPuas = $query->where('satisfaction', '<', 40)->count();
             
             $senangRate = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
 

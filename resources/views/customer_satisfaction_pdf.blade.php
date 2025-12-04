@@ -23,13 +23,13 @@
 
     <p class="mb-2"><strong>Periode:</strong>
         @if($startDate && $endDate)
-            {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}
+            {{ \Carbon\Carbon::parse($startDate)->translatedFormat('d F Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->translatedFormat('d F Y') }}
         @else
             Semua data
         @endif
     </p>
 
-    <p class="mb-4"><strong>Tanggal Cetak:</strong> {{ now()->format('d M Y, H:i') }}</p>
+    <p class="mb-4"><strong>Tanggal Cetak:</strong> {{ now()->translatedFormat('d F Y, H:i') }} WIB</p>
 
     <h2 class="mb-2">Ringkasan Kategori Kepuasan</h2>
     <table>
@@ -112,7 +112,9 @@
     @else
         <p>Belum ada data kepuasan pelanggan dari rekaman kamera.</p>
     @endif
+
+    <p class="text-right" style="margin-top: 24px; font-size: 10px; color: #6B7280;">
+        Dokumen ini dicetak secara otomatis oleh sistem JoyMeter pada {{ now()->translatedFormat('d F Y') }} pukul {{ now()->format('H:i') }} WIB
+    </p>
 </body>
 </html>
-
-

@@ -8,7 +8,7 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <form method="GET" action="{{ route('dashboard') }}" class="flex items-end gap-4">
             <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Rentang Waktu (Opsional)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rentang Waktu</label>
                 <p class="text-xs text-gray-500 mb-3">Kosongkan untuk menampilkan semua data</p>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -166,17 +166,40 @@
         <!-- Grafik Tren Kepuasan -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <h3 class="text-base font-semibold text-gray-900 mb-3">Tren Kepuasan</h3>
+            @if(empty($satisfactionData['labels']))
+            <div class="h-64 flex items-center justify-center text-gray-400">
+                <div class="text-center">
+                    <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <p class="text-sm">Belum ada data untuk ditampilkan</p>
+                </div>
+            </div>
+            @else
             <div class="h-64">
                 <canvas id="satisfactionTrendChart"></canvas>
             </div>
+            @endif
         </div>
 
         <!-- Grafik Distribusi Kategori -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <h3 class="text-base font-semibold text-gray-900 mb-3">Distribusi Kategori Kepuasan</h3>
+            @if($stats['total_customers'] == 0)
+            <div class="h-64 flex items-center justify-center text-gray-400">
+                <div class="text-center">
+                    <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    <p class="text-sm">Belum ada data untuk ditampilkan</p>
+                </div>
+            </div>
+            @else
             <div class="h-64">
                 <canvas id="categoryDistributionChart"></canvas>
             </div>
+            @endif
         </div>
     </div>
 
@@ -238,8 +261,13 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Belum ada data kepuasan pelanggan
+                        <td colspan="7" class="px-6 py-8 text-center">
+                            <div class="flex flex-col items-center text-gray-400">
+                                <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p class="text-sm">Belum ada riwayat kepuasan pelanggan</p>
+                            </div>
                         </td>
                     </tr>
                     @endforelse
@@ -302,6 +330,7 @@
 
 @push('scripts')
 <script>
+    @if(!empty($satisfactionData['labels']))
     // Grafik Tren Kepuasan (Persentase Senang)
     const trendCtx = document.getElementById('satisfactionTrendChart').getContext('2d');
     new Chart(trendCtx, {
@@ -358,7 +387,9 @@
             }
         }
     });
+    @endif
 
+    @if($stats['total_customers'] > 0)
     // Grafik Distribusi Kategori
     const categoryCtx = document.getElementById('categoryDistributionChart').getContext('2d');
     new Chart(categoryCtx, {
@@ -392,5 +423,6 @@
             }
         }
     });
+    @endif
 </script>
 @endpush

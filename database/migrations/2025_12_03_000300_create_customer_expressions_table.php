@@ -13,16 +13,13 @@ return new class extends Migration
     {
         Schema::create('customer_expressions', function (Blueprint $table) {
             $table->id();
-
-            // Ekspresi yang terdeteksi dari pelanggan
-            $table->string('emotion', 50);
-
-            // Tingkat keyakinan dari model deteksi (opsional)
-            $table->decimal('confidence', 5, 2)->nullable();
-
-            // Waktu ketika ekspresi terdeteksi
-            $table->timestamp('detected_at')->index();
-
+            $table->string('session_id')->index();
+            $table->json('avg_scores');           
+            $table->string('dominant_emotion');    
+            $table->unsignedTinyInteger('satisfaction'); 
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('ended_at')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

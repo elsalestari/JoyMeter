@@ -77,7 +77,7 @@
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-semibold text-gray-900">@yield('page-title', 'Dashboard')</h2>
                     <div class="text-sm text-gray-500">
-                        {{ now()->format('d M Y, H:i') }}
+                        {{ now()->translatedFormat('l, d F Y - H:i') }} WIB
                     </div>
                 </div>
             </header>
@@ -92,4 +92,3 @@
     @stack('scripts')
 </body>
 </html>
-

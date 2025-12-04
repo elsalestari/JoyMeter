@@ -10,35 +10,38 @@ class CustomerExpression extends Model
     use HasFactory;
 
     protected $fillable = [
-        'emotion',
-        'confidence',
-        'detected_at',
+        'session_id',
+        'avg_scores',
+        'dominant_emotion',
+        'satisfaction',
+        'started_at',
+        'ended_at',
+        'notes',
     ];
 
     protected $casts = [
-        'confidence' => 'decimal:2',
-        'detected_at' => 'datetime',
+        'avg_scores' => 'array',
+        'satisfaction' => 'integer',
+        'started_at' => 'datetime',
+        'ended_at' => 'datetime',
     ];
 
     /**
      * Get satisfaction category (3 levels: Senang, Netral, Tidak Puas)
-     * Based directly on emotion
+     * Based on numeric satisfaction (0 - 100)
      */
     public function getSatisfactionCategoryAttribute(): string
     {
-        $emotion = strtolower($this->emotion);
-        
-        // Senang: happy, surprised
-        if (in_array($emotion, ['happy', 'surprised'])) {
+        $score = (int) $this->satisfaction;
+
+        if ($score >= 70) {
             return 'Senang';
         }
-        
-        // Netral: neutral
-        if ($emotion === 'neutral') {
+
+        if ($score >= 40) {
             return 'Netral';
         }
-        
-        // Tidak Puas: sad, angry, fear, disgust
+
         return 'Tidak Puas';
     }
 
@@ -47,7 +50,7 @@ class CustomerExpression extends Model
      */
     public function getEmotionEmojiAttribute(): string
     {
-        $emotion = strtolower($this->emotion);
+        $emotion = strtolower($this->dominant_emotion ?? '');
         
         $emojiMap = [
             'happy' => '😊',
@@ -83,7 +86,7 @@ class CustomerExpression extends Model
      */
     public function getEmotionLabelAttribute(): string
     {
-        $emotion = strtolower($this->emotion);
+        $emotion = strtolower($this->dominant_emotion ?? '');
         
         $labelMap = [
             'happy' => 'Senang',
@@ -98,16 +101,4 @@ class CustomerExpression extends Model
         return $labelMap[$emotion] ?? ucfirst($emotion);
     }
 
-    /**
-     * Static method to get all emotions that belong to a satisfaction category
-     */
-    public static function getEmotionsByCategory(string $category): array
-    {
-        return match(strtolower($category)) {
-            'senang' => ['happy', 'surprised'],
-            'netral' => ['neutral'],
-            'tidak puas' => ['sad', 'angry', 'fear', 'disgust'],
-            default => [],
-        };
-    }
 }
