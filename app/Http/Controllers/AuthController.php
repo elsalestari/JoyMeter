@@ -17,6 +17,11 @@ class AuthController extends Controller
      */
     public function create(): View
     {
+        // Redirect jika sudah login
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('auth.login');
     }
 
@@ -27,28 +32,44 @@ class AuthController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Validasi input
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'email', 'max:255'],
+            'password' => ['required', 'string', 'min:6'],
+        ], [
+            'email.required' => 'Email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password harus diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
         ]);
 
+        // Attempt login
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'email' => 'Email atau password yang Anda masukkan salah.',
             ]);
         }
 
-        if (!in_array(Auth::user()->role, self::ALLOWED_ROLES, true)) {
+        $user = Auth::user();
+
+        // Validasi role user
+        if (!in_array($user->role, self::ALLOWED_ROLES, true)) {
             Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
             throw ValidationException::withMessages([
-                'email' => __('Akses hanya untuk staff atau admin.'),
+                'email' => 'Akses ditolak. Hanya staff atau admin yang dapat masuk ke sistem.',
             ]);
         }
 
+        // Regenerate session untuk keamanan (mencegah session fixation)
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        // Redirect berdasarkan role
+        $intendedUrl = $request->session()->pull('url.intended', $this->getRedirectUrl($user->role));
+
+        return redirect()->to($intendedUrl)->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 
     /**
@@ -56,12 +77,25 @@ class AuthController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $userName = Auth::user()->name ?? 'Pengguna';
+
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('login')->with('success', 'Anda telah berhasil keluar. Sampai jumpa, ' . $userName . '!');
+    }
+
+    /**
+     * Get redirect URL based on user role.
+     */
+    private function getRedirectUrl(string $role): string
+    {
+        return match($role) {
+            'admin' => route('dashboard'),
+            'staff' => route('dashboard'),
+            default => route('login'),
+        };
     }
 }
-

@@ -22,6 +22,25 @@
 @endsection
 
 @section('content')
+    {{-- Flash Messages --}}
+    @if(session('success'))
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
+        <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <p class="text-sm text-green-800">{{ session('success') }}</p>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
+        <svg class="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <p class="text-sm text-red-800">{{ session('error') }}</p>
+    </div>
+    @endif
+
     <form method="POST" action="{{ route('login') }}" class="space-y-8">
         @csrf
 
@@ -47,7 +66,12 @@
                        class="block w-full pl-10 pr-4 py-3 border border-[#F7AA4A] bg-white rounded-lg focus:ring-2 focus:ring-[#F6821F] focus:border-[#F6821F] sm:text-sm transition-colors @error('email') border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500 @enderror">
             </div>
             @error('email')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ $message }}
+                </p>
             @enderror
         </div>
 
@@ -85,21 +109,26 @@
                 </div>
             </div>
             @error('password')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ $message }}
+                </p>
             @enderror
         </div>
 
         <div class="flex items-center justify-between">
-            <label class="flex items-center text-sm text-[#6b4c14]">
+            <label class="flex items-center text-sm text-[#6b4c14] cursor-pointer">
                 <input id="remember"
                        type="checkbox"
                        name="remember"
-                       class="h-4 w-4 text-[#F6821F] focus:ring-[#F6821F] border-[#F7AA4A] rounded transition-colors"
+                       class="h-4 w-4 text-[#F6821F] focus:ring-[#F6821F] border-[#F7AA4A] rounded transition-colors cursor-pointer"
                        @checked(old('remember'))>
                 <span class="ml-2">Ingat saya</span>
             </label>
             @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="text-sm font-medium text-[#6b4c14] hover:text-[#3b2a07]">
+                <a href="{{ route('password.request') }}" class="text-sm font-medium text-[#6b4c14] hover:text-[#3b2a07] transition-colors">
                     Lupa password?
                 </a>
             @endif
@@ -107,7 +136,7 @@
 
         <div>
             <button type="submit"
-                class="relative w-full inline-flex items-center justify-center px-4 py-3.5 text-sm font-semibold text-[#3b2a07] bg-[#F6821F] rounded-lg hover:bg-[#d96f1a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F7AA4A] transition-colors">
+                class="relative w-full inline-flex items-center justify-center px-4 py-3.5 text-sm font-semibold text-[#3b2a07] bg-[#F6821F] rounded-lg hover:bg-[#d96f1a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F7AA4A] transition-all duration-200 transform hover:scale-[1.02]">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-5 w-5 text-[#FAEF9F]" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M14.243 5.757a6 6 0 10-.986 9.284 1 1 0 111.087 1.678A8 8 0 1118 10a3 3 0 01-4.8 2.401A4 4 0 1114 10a1 1 0 102 0c0-1.537-.586-3.07-1.757-4.243zM12 10a2 2 0 10-4 0 2 2 0 004 0z" clip-rule="evenodd" />
@@ -120,20 +149,19 @@
 @endsection
 
 @section('auth-footer')
-    <p>
-        Gunakan akun staff/admin. Hubungi admin jika lupa.
+    <p class="text-gray-500">
+        Gunakan akun staff/admin. Hubungi admin jika lupa kredensial Anda.
     </p>
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Toggle password visibility
             document.querySelectorAll('[data-toggle-password]').forEach((button) => {
                 const targetId = button.dataset.togglePassword;
                 const input = document.getElementById(targetId);
-                if (!input) {
-                    return;
-                }
+                if (!input) return;
 
                 const showIcon = button.querySelector('[data-password-icon="show"]');
                 const hideIcon = button.querySelector('[data-password-icon="hide"]');
@@ -149,7 +177,18 @@
                     }
                 });
             });
+
+            // Auto-hide success/error messages after 5 seconds
+            const messages = document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"]');
+            messages.forEach(msg => {
+                if (msg.parentElement.tagName !== 'FORM') {
+                    setTimeout(() => {
+                        msg.style.transition = 'opacity 0.5s ease-out';
+                        msg.style.opacity = '0';
+                        setTimeout(() => msg.remove(), 500);
+                    }, 5000);
+                }
+            });
         });
     </script>
 @endpush
-

@@ -14,14 +14,18 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
+     * Apply middleware to restrict access
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:staff,admin']);
+    }
+
+    /**
      * Display the dashboard.
      */
-    public function index(Request $request): View|RedirectResponse
+    public function index(Request $request): View
     {
-        if (Auth::user()->role !== 'staff') {
-            abort(403, 'Akses ditolak. Hanya staff yang dapat mengakses dashboard.');
-        }
-
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
@@ -33,7 +37,7 @@ class DashboardController extends Controller
         
         $monthlyHistory = $this->getMonthlySatisfactionHistory($startDate, $endDate);
 
-        $staffActivities = User::where('role', 'staff')
+        $staffActivities = User::whereIn('role', ['staff', 'admin'])
             ->orderBy('updated_at', 'desc')
             ->limit(10)
             ->get();

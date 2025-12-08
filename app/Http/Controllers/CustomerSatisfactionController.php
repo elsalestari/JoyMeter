@@ -14,14 +14,18 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class CustomerSatisfactionController extends Controller
 {
     /**
+     * Apply middleware to restrict access
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:staff,admin']);
+    }
+
+    /**
      * Halaman utama menu Kepuasan Pelanggan.
      */
-    public function index(Request $request): View|RedirectResponse
+    public function index(Request $request): View
     {
-        if (Auth::user()->role !== 'staff') {
-            abort(403, 'Akses ditolak. Hanya staff yang dapat mengakses menu ini.');
-        }
-
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
@@ -45,10 +49,6 @@ class CustomerSatisfactionController extends Controller
      */
     public function exportPdf(Request $request)
     {
-        if (Auth::user()->role !== 'staff') {
-            abort(403, 'Akses ditolak. Hanya staff yang dapat mengakses menu ini.');
-        }
-
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
@@ -251,4 +251,3 @@ class CustomerSatisfactionController extends Controller
         })->toArray();
     }
 }
-
