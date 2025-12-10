@@ -276,19 +276,19 @@
         </div>
     </div>
 
-    <!-- Tabel Aktivitas Staff -->
+    <!-- Tabel Aktivitas Karyawan -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Aktivitas Staff</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Aktivitas Karyawan</h3>
         </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Staff</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Karyawan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peran</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktivitas Terakhir</th>
                     </tr>
                 </thead>
@@ -308,7 +308,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
-                                {{ $staff->role }}
+                                {{ $staff->role === 'staff' ? 'Karyawan' : ucfirst($staff->role) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -318,7 +318,7 @@
                     @empty
                     <tr>
                         <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Belum ada data staff
+                            Belum ada data karyawan
                         </td>
                     </tr>
                     @endforelse

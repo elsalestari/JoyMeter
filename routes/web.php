@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerSatisfactionController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Routes (hanya bisa diakses jika belum login)
@@ -25,6 +26,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [CustomerSatisfactionController::class, 'index'])->name('index');
         Route::get('/export-pdf', [CustomerSatisfactionController::class, 'exportPdf'])->name('export-pdf');
     });
+    
+    // Staff Management
+    Route::resource('staff', StaffController::class)->except(['show']);
 });
 
 // Redirect root to dashboard or login

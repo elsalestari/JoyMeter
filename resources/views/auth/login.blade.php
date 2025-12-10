@@ -8,7 +8,7 @@
         Monitoring Kepuasan Pelanggan Secara Real-Time
     </h2>
     <p class="mt-6 text-[#4b3410] text-lg">
-        Platform khusus staff & admin untuk memantau kinerja layanan, memahami pelanggan, dan meningkatkan mutu pelayanan.
+        Platform untuk memantau kinerja layanan, memahami pelanggan, dan meningkatkan mutu pelayanan.
     </p>
 @endsection
 
@@ -150,7 +150,7 @@
 
 @section('auth-footer')
     <p class="text-gray-500">
-        Gunakan akun staff/admin. Hubungi admin jika lupa kredensial Anda.
+        Gunakan akun karyawan/admin. Hubungi admin jika lupa kredensial Anda.
     </p>
 @endsection
 
