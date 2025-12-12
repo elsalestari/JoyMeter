@@ -17,7 +17,6 @@ class AuthController extends Controller
      */
     public function create(): View
     {
-        // Redirect jika sudah login
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
@@ -32,7 +31,6 @@ class AuthController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // Validasi input
         $credentials = $request->validate([
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:6'],
@@ -43,7 +41,6 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 6 karakter.',
         ]);
 
-        // Attempt login
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'Email atau password yang Anda masukkan salah.',
@@ -52,7 +49,6 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Validasi role user
         if (!in_array($user->role, self::ALLOWED_ROLES, true)) {
             Auth::logout();
             $request->session()->invalidate();
@@ -63,10 +59,8 @@ class AuthController extends Controller
             ]);
         }
 
-        // Regenerate session untuk keamanan (mencegah session fixation)
         $request->session()->regenerate();
 
-        // Redirect berdasarkan role
         $intendedUrl = $request->session()->pull('url.intended', $this->getRedirectUrl($user->role));
 
         return redirect()->to($intendedUrl)->with('success', 'Selamat datang, ' . $user->name . '!');

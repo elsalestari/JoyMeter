@@ -18,10 +18,8 @@ class StaffController extends Controller
      */
     public function __construct()
     {
-        // Staff dan admin bisa lihat list
         $this->middleware(['auth', 'role:staff,admin'])->only(['index']);
         
-        // Hanya admin yang bisa create, edit, delete
         $this->middleware(['auth', 'role:admin'])->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
@@ -33,12 +31,10 @@ class StaffController extends Controller
         $query = User::whereIn('role', ['staff', 'admin'])
             ->orderBy('created_at', 'desc');
 
-        // Filter berdasarkan role jika ada
         if ($request->has('role') && in_array($request->role, ['staff', 'admin'])) {
             $query->where('role', $request->role);
         }
 
-        // Search berdasarkan nama atau email
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -124,7 +120,6 @@ class StaffController extends Controller
         $staff->email = $validated['email'];
         $staff->role = $validated['role'];
 
-        // Update password hanya jika diisi
         if (!empty($validated['password'])) {
             $staff->password = Hash::make($validated['password']);
         }
@@ -140,7 +135,6 @@ class StaffController extends Controller
      */
     public function destroy(User $staff): RedirectResponse
     {
-        // Cegah admin menghapus dirinya sendiri
         if ($staff->id === Auth::id()) {
             return redirect()->route('staff.index')
                 ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');

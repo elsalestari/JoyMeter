@@ -22,7 +22,7 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Halaman utama menu Kepuasan Pelanggan.
+     * Main page of the Customer Satisfaction menu
      */
     public function index(Request $request): View
     {
@@ -45,7 +45,7 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Export statistik kepuasan pelanggan ke PDF.
+     * Export customer satisfaction statistics to PDF
      */
     public function exportPdf(Request $request)
     {
@@ -72,7 +72,7 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Statistik ringkas kepuasan pelanggan.
+     * Summary statistics on customer satisfaction
      */
     private function getStatistics(?string $startDate, ?string $endDate): array
     {
@@ -108,7 +108,7 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Data tren kepuasan (persentase Senang per periode).
+     * Satisfaction trend data (percentage of Satisfied per period)
      */
     private function getSatisfactionTrendData(?string $startDate, ?string $endDate): array
     {
@@ -175,7 +175,7 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Distribusi kategori kepuasan (Senang, Netral, Tidak Puas).
+     * Distribution of satisfaction categories (Senang, Netral, Tidak Puas)
      */
     private function getCategoryDistribution(?string $startDate, ?string $endDate): array
     {
@@ -212,7 +212,7 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Riwayat kepuasan per hari (maksimal 20 hari terakhir).
+     * Daily satisfaction history (maximum of the last 20 days)
      */
     private function getDailySatisfactionHistory(?string $startDate, ?string $endDate): array
     {
