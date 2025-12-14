@@ -18,19 +18,15 @@
     <!-- Header & Filters -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900">
-                    @if(auth()->user()->role === 'admin')
-                        Semua Tiket Support
-                    @else
-                        Tiket Support Anda
-                    @endif
-                </h3>
+            <h3 class="text-lg font-semibold text-gray-900">
                 @if(auth()->user()->role === 'admin')
-                <p class="text-sm text-gray-500 mt-1">Kelola dan respon tiket dari karyawan</p>
+                    Semua Tiket Support
+                @else
+                    Tiket Support Anda
                 @endif
-            </div>
+            </h3>
             
+            {{-- Button Buat Tiket HANYA untuk Staff --}}
             @if(auth()->user()->role === 'staff')
             <a href="{{ route('support.tickets.create') }}" 
                class="px-6 py-2 bg-gradient-to-r from-[#F7AA4A] to-[#F6821F] text-white rounded-md hover:shadow-lg transition-all text-sm font-medium flex items-center justify-center">
@@ -65,10 +61,10 @@
                 <select name="priority" 
                         class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#F7AA4A]">
                     <option value="">Semua Prioritas</option>
-                    <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Mendesak</option>
-                    <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Tinggi</option>
-                    <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Sedang</option>
                     <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Rendah</option>
+                    <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Sedang</option>
+                    <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Tinggi</option>
+                    <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Mendesak</option>
                 </select>
             </div>
             <div class="flex gap-2">

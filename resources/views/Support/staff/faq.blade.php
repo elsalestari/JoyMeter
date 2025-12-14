@@ -1,12 +1,7 @@
-{{-- ================================================================= --}}
-{{-- FILE: resources/views/support/staff/faq.blade.php --}}
-{{-- FAQ UNTUK STAFF/KARYAWAN --}}
-{{-- ================================================================= --}}
-
 @extends('layouts.app')
 
-@section('title', 'FAQ')
-@section('page-title', 'Frequently Asked Questions')
+@section('title', 'FAQ - Bantuan')
+@section('page-title', 'Pertanyaan yang Sering Diajukan')
 
 @section('content')
     <!-- Back Button -->
@@ -20,243 +15,281 @@
         </a>
     </div>
 
-    <!-- Intro -->
-    <div class="bg-gradient-to-r from-[#F7AA4A] to-[#F6821F] rounded-lg shadow-lg p-8 mb-6 text-white">
-        <h2 class="text-2xl font-bold mb-2">📚 Frequently Asked Questions</h2>
-        <p class="opacity-90">Temukan jawaban untuk pertanyaan yang sering diajukan</p>
-    </div>
-
-    <!-- Search Box -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="relative">
-            <input type="text" 
-                   id="faqSearch"
-                   placeholder="Cari pertanyaan..." 
-                   class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7AA4A]">
-            <svg class="w-5 h-5 text-gray-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+    <!-- FAQ Header -->
+    <div class="bg-gradient-to-r from-[#F7AA4A] to-[#F6821F] rounded-lg shadow-sm p-8 mb-6 text-white">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold mb-2">Pertanyaan yang Sering Diajukan</h2>
+                <p class="text-white/90">Temukan jawaban untuk pertanyaan umum seputar JoyMeter</p>
+            </div>
         </div>
     </div>
 
-    <!-- FAQ Categories -->
-    <div class="space-y-6">
-        <!-- Umum -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-6 h-6 text-[#F7AA4A] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- FAQ Accordion -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-6">
+            <div class="space-y-4">
+                <!-- FAQ 1: Akun & Login -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                            onclick="toggleFaq('faq1')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAEF9F] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#F6821F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900">Bagaimana cara login ke sistem JoyMeter?</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-500 transition-transform" id="faq1-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="faq1" class="hidden px-6 py-4 bg-white border-t border-gray-200">
+                        <p class="text-gray-700 mb-3">Untuk login ke sistem JoyMeter, ikuti langkah berikut:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                            <li>Buka halaman login JoyMeter di browser Anda</li>
+                            <li>Masukkan email dan password yang telah diberikan oleh administrator</li>
+                            <li>Klik tombol "Masuk ke Akun"</li>
+                            <li>Anda akan diarahkan ke dashboard utama</li>
+                        </ol>
+                        <p class="text-sm text-gray-600 mt-3">
+                            <strong>Catatan:</strong> Pastikan Anda menggunakan akun dengan role Karyawan atau Admin. 
+                            Jika mengalami kesulitan login, hubungi administrator sistem.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 2: Lupa Password -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                            onclick="toggleFaq('faq2')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAEF9F] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#F6821F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900">Bagaimana jika saya lupa password?</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-500 transition-transform" id="faq2-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="faq2" class="hidden px-6 py-4 bg-white border-t border-gray-200">
+                        <p class="text-gray-700 mb-3">Jika Anda lupa password, Anda dapat mengubahnya sendiri setelah login:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700 mb-4">
+                            <li>Klik foto profil Anda di pojok kanan atas</li>
+                            <li>Pilih menu "Pengaturan" atau "Profil Saya"</li>
+                            <li>Scroll ke bagian "Ubah Password"</li>
+                            <li>Masukkan password lama dan password baru Anda</li>
+                            <li>Klik tombol "Ubah Password"</li>
+                        </ol>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p class="text-sm text-blue-800">
+                                <strong>💡 Tips Keamanan:</strong><br>
+                                • Gunakan password minimal 6 karakter<br>
+                                • Kombinasikan huruf, angka, dan simbol<br>
+                                • Jangan gunakan password yang mudah ditebak<br>
+                                • Ubah password secara berkala untuk keamanan akun Anda
+                            </p>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-3">
+                            <strong>Jika tidak bisa login sama sekali:</strong> Hubungi administrator untuk reset password atau buat tiket support.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 3: Mengubah Profil -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                            onclick="toggleFaq('faq3')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAEF9F] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#F6821F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900">Bagaimana cara mengubah informasi profil saya?</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-500 transition-transform" id="faq3-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="faq3" class="hidden px-6 py-4 bg-white border-t border-gray-200">
+                        <p class="text-gray-700 mb-3">Anda dapat mengubah informasi profil Anda dengan cara:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                            <li>Klik foto profil Anda di pojok kanan atas</li>
+                            <li>Pilih menu "Profil Saya"</li>
+                            <li>Klik tombol "Edit Profil"</li>
+                            <li>Ubah nama atau email Anda</li>
+                            <li>Klik "Simpan Perubahan"</li>
+                        </ol>
+                        <p class="text-sm text-gray-600 mt-3">
+                            <strong>Catatan:</strong> Role/peran akun Anda tidak dapat diubah sendiri. Hubungi administrator jika perlu mengubah role.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 4: Membuat Tiket Support -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                            onclick="toggleFaq('faq4')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAEF9F] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#F6821F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900">Bagaimana cara membuat tiket support?</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-500 transition-transform" id="faq4-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="faq4" class="hidden px-6 py-4 bg-white border-t border-gray-200">
+                        <p class="text-gray-700 mb-3">Untuk membuat tiket support baru:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                            <li>Buka menu "Support" dari sidebar</li>
+                            <li>Klik tombol "Laporkan Masalah" atau "Buat Tiket Baru"</li>
+                            <li>Pilih kategori masalah (Bug, Feature Request, Question, Technical, Other)</li>
+                            <li>Pilih tingkat prioritas (Low, Medium, High, Urgent)</li>
+                            <li>Isi subjek dan deskripsi masalah secara detail</li>
+                            <li>Klik "Submit Tiket"</li>
+                        </ol>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                            <p class="text-sm text-blue-800">
+                                <strong>💡 Tips:</strong> Berikan deskripsi yang jelas dan detail agar tim support dapat membantu Anda dengan lebih cepat.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5: Status Tiket -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                            onclick="toggleFaq('faq5')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAEF9F] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#F6821F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900">Apa arti dari status tiket support?</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-500 transition-transform" id="faq5-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="faq5" class="hidden px-6 py-4 bg-white border-t border-gray-200">
+                        <p class="text-gray-700 mb-3">Status tiket menunjukkan progress penanganan masalah Anda:</p>
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">Open</span>
+                                <p class="text-gray-700 flex-1">Tiket baru yang belum ditangani oleh admin. Menunggu respons dari tim support.</p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">In Progress</span>
+                                <p class="text-gray-700 flex-1">Tiket sedang dalam proses penanganan. Admin telah merespons dan sedang mengerjakan solusi.</p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Resolved</span>
+                                <p class="text-gray-700 flex-1">Masalah telah diselesaikan oleh admin. Anda dapat memeriksa solusi yang diberikan.</p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">Closed</span>
+                                <p class="text-gray-700 flex-1">Tiket telah ditutup. Tidak ada tindakan lebih lanjut yang diperlukan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6: Keamanan Akun -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between"
+                            onclick="toggleFaq('faq6')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAEF9F] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#F6821F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-900">Bagaimana cara menjaga keamanan akun saya?</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-500 transition-transform" id="faq6-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="faq6" class="hidden px-6 py-4 bg-white border-t border-gray-200">
+                        <p class="text-gray-700 mb-3">Tips menjaga keamanan akun JoyMeter Anda:</p>
+                        <ul class="space-y-2 text-gray-700">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Gunakan password yang kuat dan unik (minimal 6 karakter, kombinasi huruf, angka, simbol)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Ubah password secara berkala (setiap 3-6 bulan)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Jangan bagikan password Anda kepada siapapun</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Selalu logout setelah selesai menggunakan sistem, terutama di komputer publik</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Jangan simpan password di browser jika menggunakan komputer bersama</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Laporkan segera ke administrator jika mencurigai ada aktivitas tidak wajar di akun Anda</span>
+                            </li>
+                        </ul>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+                            <p class="text-sm text-yellow-800">
+                                <strong>⚠️ Penting:</strong> Jangan pernah memberikan password Anda kepada siapapun, termasuk yang mengaku sebagai admin atau technical support.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bantuan Tambahan -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Umum
-            </h3>
-            <div class="space-y-4">
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Apa itu JoyMeter?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        JoyMeter adalah sistem analisis kepuasan pelanggan berbasis AI yang menggunakan teknologi pengenalan ekspresi wajah untuk mengukur tingkat kepuasan pelanggan secara real-time melalui kamera.
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Siapa yang bisa menggunakan sistem ini?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Sistem ini digunakan oleh karyawan dan admin perusahaan. Karyawan dapat melihat data dan membuat laporan, sedangkan admin memiliki akses penuh untuk mengelola data, karyawan, dan pengaturan sistem.
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara kerja sistem ini?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Sistem menggunakan kamera untuk menangkap ekspresi wajah pelanggan, kemudian AI menganalisis ekspresi tersebut dan mengklasifikasikannya ke dalam kategori emosi (senang, sedih, marah, dll). Data ini kemudian ditampilkan dalam dashboard untuk analisis lebih lanjut.
-                    </div>
-                </details>
             </div>
-        </div>
-
-        <!-- Dashboard & Data -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-6 h-6 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Dashboard & Data
-            </h3>
-            <div class="space-y-4">
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara membaca data di dashboard?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Dashboard menampilkan 3 kategori utama: Senang (≥70%), Netral (40-69%), dan Tidak Puas (<40%). Grafik tren menunjukkan perubahan kepuasan dari waktu ke waktu, dan tabel riwayat memberikan detail per hari/bulan.
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara filter data berdasarkan tanggal?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Gunakan form "Rentang Waktu" di bagian atas halaman. Pilih tanggal mulai dan tanggal akhir, lalu klik "Terapkan Filter". Untuk melihat semua data, klik "Tampilkan Semua".
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara export data ke PDF?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Buka menu "Kepuasan Pelanggan", pilih filter tanggal jika diperlukan, kemudian klik tombol "Export PDF" di bagian atas. File PDF akan otomatis terdownload.
-                    </div>
-                </details>
-            </div>
-        </div>
-
-        <!-- Akun & Keamanan -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Akun & Keamanan
-            </h3>
-            <div class="space-y-4">
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara mengganti password?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Hubungi administrator untuk mengganti password Anda. Admin dapat mengubah password melalui menu Karyawan > Edit.
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Lupa password, bagaimana?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Hubungi administrator atau tim support untuk mereset password Anda. Buat tiket support dengan kategori "Masalah Teknis" untuk permintaan reset password.
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Apa perbedaan role Karyawan dan Admin?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        <strong>Karyawan:</strong> Dapat melihat dashboard, data kepuasan pelanggan, daftar karyawan, dan membuat tiket support.<br>
-                        <strong>Admin:</strong> Memiliki semua akses Karyawan plus dapat mengelola data karyawan (tambah, edit, hapus) dan menjawab tiket support.
-                    </div>
-                </details>
-            </div>
-        </div>
-
-        <!-- Support & Tiket -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-6 h-6 text-orange-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                Support & Tiket
-            </h3>
-            <div class="space-y-4">
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara membuat tiket support?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        <ol class="list-decimal ml-5 space-y-1">
-                            <li>Buka menu <strong>Support</strong> dari sidebar</li>
-                            <li>Klik tombol <strong>"Laporkan Masalah"</strong> atau <strong>"Buat Tiket Baru"</strong></li>
-                            <li>Pilih kategori masalah (Bug, Pertanyaan, Teknis, dll)</li>
-                            <li>Pilih tingkat prioritas</li>
-                            <li>Tulis subjek yang jelas dan deskripsi lengkap</li>
-                            <li>Klik <strong>"Kirim Tiket"</strong></li>
-                            <li>Tim support akan merespon dalam 1x24 jam</li>
-                        </ol>
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Berapa lama tiket saya akan direspon?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        <p class="mb-2">Waktu respon tergantung prioritas:</p>
-                        <ul class="ml-5 space-y-1">
-                            <li>• <strong>Mendesak:</strong> Maksimal 1 jam</li>
-                            <li>• <strong>Tinggi:</strong> Maksimal 4 jam</li>
-                            <li>• <strong>Sedang:</strong> Maksimal 24 jam</li>
-                            <li>• <strong>Rendah:</strong> Maksimal 3 hari kerja</li>
-                        </ul>
-                    </div>
-                </details>
-
-                <details class="faq-item group">
-                    <summary class="cursor-pointer list-none flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span class="font-medium text-gray-900">Bagaimana cara melihat status tiket saya?</span>
-                        <svg class="w-5 h-5 text-gray-500 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </summary>
-                    <div class="mt-3 px-4 text-sm text-gray-600">
-                        Buka menu <strong>Support > Tiket Support Anda</strong>. Anda akan melihat daftar semua tiket Anda dengan status masing-masing (Terbuka, Dalam Proses, Terselesaikan, Ditutup). Klik pada tiket untuk melihat detail dan respon dari admin.
-                    </div>
-                </details>
-            </div>
-        </div>
-    </div>
-
-    <!-- Contact Support -->
-    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <div class="flex items-start">
-            <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-                <h4 class="font-medium text-blue-900 mb-1">Tidak menemukan jawaban Anda?</h4>
-                <p class="text-sm text-blue-700 mb-3">Hubungi tim support kami untuk mendapatkan bantuan lebih lanjut.</p>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-blue-900 mb-2">Tidak Menemukan Jawaban?</h3>
+                <p class="text-blue-800 mb-4">Jika pertanyaan Anda tidak terjawab di FAQ ini, jangan ragu untuk menghubungi kami.</p>
                 <a href="{{ route('support.tickets.create') }}" 
-                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="inline-flex items-center px-4 py-2 bg-[#F6821F] text-white rounded-lg hover:bg-[#d96f1a] transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Buat Tiket Support
@@ -268,19 +301,17 @@
 
 @push('scripts')
 <script>
-    // Simple FAQ Search
-    document.getElementById('faqSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const faqItems = document.querySelectorAll('.faq-item');
+    function toggleFaq(id) {
+        const content = document.getElementById(id);
+        const icon = document.getElementById(id + '-icon');
         
-        faqItems.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    });
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.add('hidden');
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
 </script>
 @endpush

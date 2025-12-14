@@ -28,7 +28,7 @@
                         <li>• Gunakan subjek yang jelas dan deskriptif</li>
                         <li>• Jelaskan masalah secara detail dan spesifik</li>
                         <li>• Sertakan langkah-langkah yang sudah Anda coba</li>
-                        <li>• Prioritas akan ditentukan otomatis berdasarkan kategori</li>
+                        <li>• Prioritas akan otomatis disesuaikan berdasarkan kategori</li>
                         <li>• Tim support akan merespon dalam 1x24 jam</li>
                     </ul>
                 </div>
@@ -51,66 +51,90 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F7AA4A] @error('category') border-red-300 @enderror">
                         <option value="">Pilih Kategori</option>
                         <option value="bug" {{ old('category') == 'bug' ? 'selected' : '' }}>Bug/Error</option>
-                        <option value="technical" {{ old('category') == 'technical' ? 'selected' : '' }}>Masalah Teknis</option>
                         <option value="feature" {{ old('category') == 'feature' ? 'selected' : '' }}>Permintaan Fitur</option>
                         <option value="question" {{ old('category') == 'question' ? 'selected' : '' }}>Pertanyaan</option>
+                        <option value="technical" {{ old('category') == 'technical' ? 'selected' : '' }}>Masalah Teknis</option>
                         <option value="other" {{ old('category') == 'other' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                     @error('category')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
-                    <p class="mt-2 text-xs text-gray-500">
-                        <span class="font-medium">Prioritas otomatis:</span>
-                        <span id="priorityInfo" class="text-gray-600">Pilih kategori untuk melihat prioritas</span>
+                    <!-- Auto Priority Info -->
+                    <p id="priorityInfo" class="mt-2 text-sm text-gray-600 italic">
+                        💡 Prioritas otomatis: <span id="priorityText">Pilih kategori untuk melihat prioritas</span>
                     </p>
                 </div>
 
-                <!-- Prioritas -->
-                <div>
-                    <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">
-                        Prioritas <span class="text-red-500">*</span>
+                <!-- Prioritas - AUTO SELECTED (Hidden from user but can be changed) -->
+                <div id="prioritySection">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Prioritas <span class="text-xs text-gray-500">(Otomatis disesuaikan)</span>
                     </label>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ old('priority') == 'low' ? 'border-green-500 ring-2 ring-green-500' : 'border-gray-300' }}">
-                            <input type="radio" name="priority" value="low" class="sr-only" {{ old('priority') == 'low' ? 'checked' : '' }} required>
+                        <!-- Low Priority -->
+                        <label id="priority-low" class="priority-option relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-all border-gray-300 hover:bg-gray-50">
+                            <input type="radio" 
+                                   name="priority" 
+                                   value="low" 
+                                   class="sr-only" 
+                                   {{ old('priority') == 'low' ? 'checked' : '' }} 
+                                   required>
                             <span class="flex flex-1 flex-col">
                                 <span class="block text-sm font-medium text-gray-900">Rendah</span>
                                 <span class="mt-1 flex items-center text-xs text-gray-500">Tidak mendesak</span>
                             </span>
-                            <svg class="h-5 w-5 text-green-600 {{ old('priority') == 'low' ? '' : 'invisible' }}" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="checkmark h-5 w-5 text-green-600 absolute top-3 right-3 hidden" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                         </label>
 
-                        <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ old('priority') == 'medium' ? 'border-yellow-500 ring-2 ring-yellow-500' : 'border-gray-300' }}">
-                            <input type="radio" name="priority" value="medium" class="sr-only" {{ old('priority', 'medium') == 'medium' ? 'checked' : '' }} required>
+                        <!-- Medium Priority -->
+                        <label id="priority-medium" class="priority-option relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-all border-gray-300 hover:bg-gray-50">
+                            <input type="radio" 
+                                   name="priority" 
+                                   value="medium" 
+                                   class="sr-only" 
+                                   {{ old('priority') == 'medium' ? 'checked' : '' }} 
+                                   required>
                             <span class="flex flex-1 flex-col">
                                 <span class="block text-sm font-medium text-gray-900">Sedang</span>
                                 <span class="mt-1 flex items-center text-xs text-gray-500">Cukup penting</span>
                             </span>
-                            <svg class="h-5 w-5 text-yellow-600 {{ old('priority', 'medium') == 'medium' ? '' : 'invisible' }}" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="checkmark h-5 w-5 text-yellow-600 absolute top-3 right-3 hidden" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                         </label>
 
-                        <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ old('priority') == 'high' ? 'border-orange-500 ring-2 ring-orange-500' : 'border-gray-300' }}">
-                            <input type="radio" name="priority" value="high" class="sr-only" {{ old('priority') == 'high' ? 'checked' : '' }} required>
+                        <!-- High Priority -->
+                        <label id="priority-high" class="priority-option relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-all border-gray-300 hover:bg-gray-50">
+                            <input type="radio" 
+                                   name="priority" 
+                                   value="high" 
+                                   class="sr-only" 
+                                   {{ old('priority') == 'high' ? 'checked' : '' }} 
+                                   required>
                             <span class="flex flex-1 flex-col">
                                 <span class="block text-sm font-medium text-gray-900">Tinggi</span>
                                 <span class="mt-1 flex items-center text-xs text-gray-500">Perlu cepat</span>
                             </span>
-                            <svg class="h-5 w-5 text-orange-600 {{ old('priority') == 'high' ? '' : 'invisible' }}" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="checkmark h-5 w-5 text-orange-600 absolute top-3 right-3 hidden" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                         </label>
 
-                        <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none {{ old('priority') == 'urgent' ? 'border-red-500 ring-2 ring-red-500' : 'border-gray-300' }}">
-                            <input type="radio" name="priority" value="urgent" class="sr-only" {{ old('priority') == 'urgent' ? 'checked' : '' }} required>
+                        <!-- Urgent Priority -->
+                        <label id="priority-urgent" class="priority-option relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-all border-gray-300 hover:bg-gray-50">
+                            <input type="radio" 
+                                   name="priority" 
+                                   value="urgent" 
+                                   class="sr-only" 
+                                   {{ old('priority') == 'urgent' ? 'checked' : '' }} 
+                                   required>
                             <span class="flex flex-1 flex-col">
                                 <span class="block text-sm font-medium text-gray-900">Mendesak</span>
                                 <span class="mt-1 flex items-center text-xs text-gray-500">Sangat urgent</span>
                             </span>
-                            <svg class="h-5 w-5 text-red-600 {{ old('priority') == 'urgent' ? '' : 'invisible' }}" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="checkmark h-5 w-5 text-red-600 absolute top-3 right-3 hidden" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                         </label>
@@ -118,6 +142,7 @@
                     @error('priority')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
+                    <p class="mt-2 text-xs text-gray-500">💡 Anda bisa mengubah prioritas jika diperlukan</p>
                 </div>
 
                 <!-- Subjek -->
@@ -178,7 +203,77 @@
 
 @push('scripts')
 <script>
-    // Character counter for subject
+    // Auto-set priority based on category
+    const categoryPriorityMap = {
+        'bug': 'high',           
+        'feature': 'low',        
+        'question': 'low',       
+        'technical': 'high',     
+        'other': 'medium'        
+    };
+
+    const priorityLabels = {
+        'low': 'Rendah (Tidak mendesak)',
+        'medium': 'Sedang (Cukup penting)',
+        'high': 'Tinggi (Perlu cepat ditangani)',
+        'urgent': 'Mendesak (Sangat urgent)'
+    };
+
+    const categorySelect = document.getElementById('category');
+    const priorityText = document.getElementById('priorityText');
+
+    // Function to set priority
+    function setPriority(priority) {
+        document.querySelectorAll('.priority-option').forEach(label => {
+            label.classList.remove('border-green-500', 'ring-2', 'ring-green-500', 'bg-green-50');
+            label.classList.remove('border-yellow-500', 'ring-yellow-500', 'bg-yellow-50');
+            label.classList.remove('border-orange-500', 'ring-orange-500', 'bg-orange-50');
+            label.classList.remove('border-red-500', 'ring-red-500', 'bg-red-50');
+            label.classList.add('border-gray-300');
+            label.querySelector('.checkmark')?.classList.add('hidden');
+        });
+
+        const selectedLabel = document.getElementById(`priority-${priority}`);
+        const selectedRadio = selectedLabel.querySelector('input[type="radio"]');
+        selectedRadio.checked = true;
+
+        if (priority === 'low') {
+            selectedLabel.classList.remove('border-gray-300');
+            selectedLabel.classList.add('border-green-500', 'ring-2', 'ring-green-500', 'bg-green-50');
+        } else if (priority === 'medium') {
+            selectedLabel.classList.remove('border-gray-300');
+            selectedLabel.classList.add('border-yellow-500', 'ring-2', 'ring-yellow-500', 'bg-yellow-50');
+        } else if (priority === 'high') {
+            selectedLabel.classList.remove('border-gray-300');
+            selectedLabel.classList.add('border-orange-500', 'ring-2', 'ring-orange-500', 'bg-orange-50');
+        } else if (priority === 'urgent') {
+            selectedLabel.classList.remove('border-gray-300');
+            selectedLabel.classList.add('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50');
+        }
+        
+        selectedLabel.querySelector('.checkmark')?.classList.remove('hidden');
+
+        priorityText.textContent = priorityLabels[priority];
+        priorityText.parentElement.classList.add('text-blue-700', 'font-medium');
+    }
+
+    categorySelect.addEventListener('change', function() {
+        const category = this.value;
+        if (category && categoryPriorityMap[category]) {
+            const priority = categoryPriorityMap[category];
+            setPriority(priority);
+        } else {
+            priorityText.textContent = 'Pilih kategori untuk melihat prioritas';
+            priorityText.parentElement.classList.remove('text-blue-700', 'font-medium');
+        }
+    });
+
+    document.querySelectorAll('input[type="radio"][name="priority"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            setPriority(this.value);
+        });
+    });
+
     const subjectInput = document.getElementById('subject');
     if (subjectInput) {
         subjectInput.addEventListener('input', function() {
@@ -212,5 +307,15 @@
             }
         });
     }
+
+    @if(old('category'))
+    document.addEventListener('DOMContentLoaded', function() {
+        const category = categorySelect.value;
+        if (category && categoryPriorityMap[category]) {
+            const priority = categoryPriorityMap[category];
+            setPriority(priority);
+        }
+    });
+    @endif
 </script>
 @endpush

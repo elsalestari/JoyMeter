@@ -48,7 +48,7 @@ class SupportController extends Controller
                     ->whereHas('user', function($query) {
                         $query->where('role', 'staff');
                     })->count(),
-                'resolved' => SupportTicket::where('status', 'resolved')
+                'resolved' => SupportTicket::whereIn('status', ['resolved', 'closed'])
                     ->whereHas('user', function($query) {
                         $query->where('role', 'staff');
                     })->count(),
@@ -67,7 +67,7 @@ class SupportController extends Controller
                 'total' => SupportTicket::where('user_id', $user->id)->count(),
                 'open' => SupportTicket::where('user_id', $user->id)->where('status', 'open')->count(),
                 'in_progress' => SupportTicket::where('user_id', $user->id)->where('status', 'in_progress')->count(),
-                'resolved' => SupportTicket::where('user_id', $user->id)->where('status', 'resolved')->count(),
+                'resolved' => SupportTicket::where('user_id', $user->id)->whereIn('status', ['resolved', 'closed'])->count(),
             ];
 
             // Route ke view staff

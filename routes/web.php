@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerSatisfactionController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -19,6 +20,14 @@ Route::middleware('auth')->group(function () {
     // Dashboard 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+    
+    // Profile Routes
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/update', [ProfileController::class, 'update'])->name('update');
+        Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
+    });
     
     // Customer Satisfaction 
     Route::prefix('customer-satisfaction')->name('customer-satisfaction.')->group(function () {
