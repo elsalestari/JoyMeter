@@ -3,10 +3,15 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerSatisfactionController;
+use App\Http\Controllers\CameraSessionController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
@@ -20,6 +25,13 @@ Route::middleware('auth')->group(function () {
     // Dashboard 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+    
+    // Camera Session Routes 
+    Route::prefix('camera')->name('camera.')->group(function () {
+        Route::get('/session', [CameraSessionController::class, 'show'])->name('session');
+        Route::post('/save-expression', [CameraSessionController::class, 'saveExpression'])->name('save-expression');
+        Route::get('/active-sessions', [CameraSessionController::class, 'activeSessions'])->name('active-sessions');
+    });
     
     // Profile Routes
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -40,22 +52,17 @@ Route::middleware('auth')->group(function () {
     
     // Support Routes
     Route::prefix('support')->name('support.')->group(function () {
-        // Main support page
         Route::get('/', [SupportController::class, 'index'])->name('index');
-        
-        // Knowledge base
         Route::get('/faq', [SupportController::class, 'faq'])->name('faq');
         Route::get('/guides', [SupportController::class, 'guides'])->name('guides');
         Route::get('/troubleshooting', [SupportController::class, 'troubleshooting'])->name('troubleshooting');
         
-        // Tickets
         Route::prefix('tickets')->name('tickets.')->group(function () {
             Route::get('/', [SupportController::class, 'tickets'])->name('index');
             Route::get('/create', [SupportController::class, 'createTicket'])->name('create');
             Route::post('/', [SupportController::class, 'storeTicket'])->name('store');
             Route::get('/{ticket}', [SupportController::class, 'showTicket'])->name('show');
             
-            // Admin only routes
             Route::middleware('role:admin')->group(function () {
                 Route::patch('/{ticket}/status', [SupportController::class, 'updateStatus'])->name('update-status');
                 Route::post('/{ticket}/reply', [SupportController::class, 'replyTicket'])->name('reply');

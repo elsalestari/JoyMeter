@@ -56,6 +56,9 @@ class DashboardController extends Controller
 
     /**
      * Get statistics with date filter (null = all data)
+     * - Senang: ≥ 80 (very happy, big smile)
+     * - Netral: 45-79 (slight smile)
+     * - Tidak Puas: < 45 (flat face)
      */
     private function getStatistics(?string $startDate, ?string $endDate): array
     {
@@ -73,9 +76,9 @@ class DashboardController extends Controller
         $today = CustomerExpression::whereDate('ended_at', today())->count();
         
         // Kategori berdasarkan nilai satisfaction (0-100)
-        $senang = (clone $query)->where('satisfaction', '>=', 70)->count();
-        $netral = (clone $query)->whereBetween('satisfaction', [40, 69])->count();
-        $tidakPuas = (clone $query)->where('satisfaction', '<', 40)->count();
+        $senang = (clone $query)->where('satisfaction', '>=', 80)->count();
+        $netral = (clone $query)->whereBetween('satisfaction', [45, 79])->count();
+        $tidakPuas = (clone $query)->where('satisfaction', '<', 45)->count();
 
         $senangRate = $total > 0 ? ($senang / $total) * 100 : 0;
         $netralRate = $total > 0 ? ($netral / $total) * 100 : 0;
@@ -95,7 +98,6 @@ class DashboardController extends Controller
 
     /**
      * Get satisfaction trend data (percentage of Senang per period)
-     * If dates are null, show monthly data from first record to now
      */
     private function getSatisfactionTrendData(?string $startDate, ?string $endDate): array
     {
@@ -115,7 +117,7 @@ class DashboardController extends Controller
                     $monthQuery = CustomerExpression::whereYear('ended_at', $current->year)
                         ->whereMonth('ended_at', $current->month);
                     $total = $monthQuery->count();
-                    $senang = $monthQuery->where('satisfaction', '>=', 70)->count();
+                    $senang = $monthQuery->where('satisfaction', '>=', 80)->count();
                     
                     $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
                     $current->addMonth();
@@ -127,7 +129,7 @@ class DashboardController extends Controller
                     
                     $dayQuery = CustomerExpression::whereDate('ended_at', $current->toDateString());
                     $total = $dayQuery->count();
-                    $senang = $dayQuery->where('satisfaction', '>=', 70)->count();
+                    $senang = $dayQuery->where('satisfaction', '>=', 80)->count();
                     
                     $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
                     $current->addDay();
@@ -147,7 +149,7 @@ class DashboardController extends Controller
                     $monthQuery = CustomerExpression::whereYear('ended_at', $current->year)
                         ->whereMonth('ended_at', $current->month);
                     $total = $monthQuery->count();
-                    $senang = $monthQuery->where('satisfaction', '>=', 70)->count();
+                    $senang = $monthQuery->where('satisfaction', '>=', 80)->count();
                     
                     $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
                     $current->addMonth();
@@ -184,9 +186,9 @@ class DashboardController extends Controller
             ];
         }
 
-        $senang = (clone $query)->where('satisfaction', '>=', 70)->count();
-        $netral = (clone $query)->whereBetween('satisfaction', [40, 69])->count();
-        $tidakPuas = (clone $query)->where('satisfaction', '<', 40)->count();
+        $senang = (clone $query)->where('satisfaction', '>=', 80)->count();
+        $netral = (clone $query)->whereBetween('satisfaction', [45, 79])->count();
+        $tidakPuas = (clone $query)->where('satisfaction', '<', 45)->count();
 
         return [
             'labels' => ['Senang', 'Netral', 'Tidak Puas'],
@@ -243,7 +245,6 @@ class DashboardController extends Controller
 
     /**
      * Get monthly satisfaction history
-     * If dates are null, show all months from first record to now
      */
     private function getMonthlySatisfactionHistory(?string $startDate, ?string $endDate): array
     {
@@ -275,9 +276,9 @@ class DashboardController extends Controller
             ]);
 
             $total = $query->count();
-            $senang = $query->where('satisfaction', '>=', 70)->count();
-            $netral = $query->whereBetween('satisfaction', [40, 69])->count();
-            $tidakPuas = $query->where('satisfaction', '<', 40)->count();
+            $senang = $query->where('satisfaction', '>=', 80)->count();
+            $netral = $query->whereBetween('satisfaction', [45, 79])->count();
+            $tidakPuas = $query->where('satisfaction', '<', 45)->count();
             
             $senangRate = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
 

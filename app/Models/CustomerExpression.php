@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CustomerExpression extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'session_id',
         'avg_scores',
@@ -21,74 +18,43 @@ class CustomerExpression extends Model
 
     protected $casts = [
         'avg_scores' => 'array',
-        'satisfaction' => 'integer',
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
     ];
 
     /**
-     * Get satisfaction category (3 levels: Senang, Netral, Tidak Puas)
-     * Based on numeric satisfaction (0 - 100)
+     * Get satisfaction category based on dominant emotion
+     * - Happy → Senang
+     * - Neutral → Netral
+     * - Others (Sad/Angry/Fearful/Disgusted/Surprised) → Tidak Puas
      */
     public function getSatisfactionCategoryAttribute(): string
     {
-        $score = (int) $this->satisfaction;
-
-        if ($score >= 70) {
-            return 'Senang';
-        }
-
-        if ($score >= 40) {
-            return 'Netral';
-        }
-
-        return 'Tidak Puas';
+        return match($this->dominant_emotion) {
+            'happy' => 'Senang',
+            'neutral' => 'Netral',
+            default => 'Tidak Puas', 
+        };
     }
 
     /**
-     * Get emoji for emotion
-     */
-    public function getEmotionEmojiAttribute(): string
-    {
-        $emotion = strtolower($this->dominant_emotion ?? '');
-        
-        $emojiMap = [
-            'happy' => '😊',
-            'sad' => '😢',
-            'angry' => '😠',
-            'surprised' => '😲',
-            'neutral' => '😐',
-            'fear' => '😨',
-            'disgust' => '🤢',
-        ];
-        
-        return $emojiMap[$emotion] ?? '😐';
-    }
-
-    /**
-     * Get emoji for satisfaction category
+     * Get emoji for satisfaction category based on dominant emotion
      */
     public function getCategoryEmojiAttribute(): string
     {
-        $category = $this->satisfaction_category;
-        
-        $emojiMap = [
-            'Senang' => '😊',
-            'Netral' => '😐',
-            'Tidak Puas' => '😞',
-        ];
-        
-        return $emojiMap[$category] ?? '😐';
+        return match($this->dominant_emotion) {
+            'happy' => '😊',
+            'neutral' => '😐',
+            default => '😞', 
+        };
     }
 
     /**
-     * Get Indonesian label for emotion
+     * Get human-readable emotion label
      */
     public function getEmotionLabelAttribute(): string
     {
-        $emotion = strtolower($this->dominant_emotion ?? '');
-        
-        $labelMap = [
+        return match($this->dominant_emotion) {
             'happy' => 'Senang',
             'sad' => 'Sedih',
             'angry' => 'Marah',
@@ -96,9 +62,24 @@ class CustomerExpression extends Model
             'neutral' => 'Netral',
             'fear' => 'Takut',
             'disgust' => 'Jijik',
-        ];
-        
-        return $labelMap[$emotion] ?? ucfirst($emotion);
+            default => 'Tidak Diketahui',
+        };
     }
 
+    /**
+     * Get emoji for emotion
+     */
+    public function getEmotionEmojiAttribute(): string
+    {
+        return match($this->dominant_emotion) {
+            'happy' => '😊',
+            'sad' => '😢',
+            'angry' => '😠',
+            'surprised' => '😲',
+            'neutral' => '😐',
+            'fear' => '😨',
+            'disgust' => '🤢',
+            default => '😐',
+        };
+    }
 }

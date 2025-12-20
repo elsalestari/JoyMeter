@@ -4,6 +4,31 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+    <!-- Camera Session Button -->
+    <div class="bg-gradient-to-r from-[#F7AA4A] via-[#F6821F] to-[#F7AA4A] rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="text-white">
+                    <h3 class="text-xl font-bold mb-1">Deteksi Ekspresi Real-Time</h3>
+                    <p class="text-sm text-white/90">Mulai sesi kamera untuk menangkap ekspresi pelanggan secara langsung</p>
+                </div>
+            </div>
+            <a href="{{ route('camera.session') }}" 
+               class="px-6 py-3 bg-white text-[#F6821F] rounded-lg hover:bg-gray-50 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Mulai Sesi Kamera
+            </a>
+        </div>
+    </div>
+
     <!-- Filter Waktu -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <form method="GET" action="{{ route('dashboard') }}" class="flex items-end gap-4">
@@ -52,7 +77,7 @@
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
             </div>
@@ -89,22 +114,22 @@
             </div>
         </div>
 
-        <!-- Ekspresi Dominan -->
+        <!-- Kategori Terbanyak -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1">Ekspresi Dominan</p>
-                    <p class="text-xl font-bold text-gray-900">{{ $dominantExpression['emotion_label'] ?? ucfirst($dominantExpression['emotion']) }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ $dominantExpression['percentage'] }}% ({{ $dominantExpression['count'] }} pelanggan)</p>
+                    <p class="text-sm text-gray-500 mb-1">Kategori Terbanyak</p>
+                    <p class="text-xl font-bold text-gray-900">{{ $dominantExpression['emotion_label'] ?? 'Senang' }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $dominantExpression['percentage'] ?? 0 }}% ({{ $dominantExpression['count'] ?? 0 }} pelanggan)</p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-2xl">
-                    {{ $dominantExpression['emotion_emoji'] ?? '😐' }}
+                    {{ $dominantExpression['emotion_emoji'] ?? '😊' }}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Kategori Kepuasan -->
+    <!-- Kategori Kepuasan (HANYA 3 KATEGORI) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Senang -->
         <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-sm border border-green-200 p-6">
@@ -121,6 +146,9 @@
                     <span class="text-sm text-green-700">Persentase</span>
                     <span class="text-xl font-semibold text-green-900">{{ number_format($stats['senang_rate'], 1) }}%</span>
                 </div>
+            </div>
+            <div class="mt-4 text-xs text-green-600 bg-green-50 rounded p-2">
+                <div class="font-medium mb-1">📊 Satisfaction Score: ≥ 80</div>
             </div>
         </div>
 
@@ -140,6 +168,9 @@
                     <span class="text-xl font-semibold text-yellow-900">{{ number_format($stats['netral_rate'], 1) }}%</span>
                 </div>
             </div>
+            <div class="mt-4 text-xs text-yellow-600 bg-yellow-50 rounded p-2">
+                <div class="font-medium mb-1">📊 Satisfaction Score: 45 - 79</div>
+            </div>
         </div>
 
         <!-- Tidak Puas -->
@@ -158,6 +189,9 @@
                     <span class="text-xl font-semibold text-red-900">{{ number_format($stats['tidak_puas_rate'], 1) }}%</span>
                 </div>
             </div>
+            <div class="mt-4 text-xs text-red-600 bg-red-50 rounded p-2">
+                <div class="font-medium mb-1">📊 Satisfaction Score: < 45</div>
+            </div>
         </div>
     </div>
 
@@ -173,6 +207,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     <p class="text-sm">Belum ada data untuk ditampilkan</p>
+                    <a href="{{ route('camera.session') }}" class="text-xs text-[#F6821F] hover:underline mt-2 inline-block">
+                        Mulai Sesi Kamera →
+                    </a>
                 </div>
             </div>
             @else
@@ -193,6 +230,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
                     </svg>
                     <p class="text-sm">Belum ada data untuk ditampilkan</p>
+                    <a href="{{ route('camera.session') }}" class="text-xs text-[#F6821F] hover:underline mt-2 inline-block">
+                        Mulai Sesi Kamera →
+                    </a>
                 </div>
             </div>
             @else
@@ -266,7 +306,10 @@
                                 <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <p class="text-sm">Belum ada riwayat kepuasan pelanggan</p>
+                                <p class="text-sm mb-2">Belum ada riwayat kepuasan pelanggan</p>
+                                <a href="{{ route('camera.session') }}" class="text-sm text-[#F6821F] hover:underline">
+                                    Mulai Sesi Kamera untuk merekam data →
+                                </a>
                             </div>
                         </td>
                     </tr>

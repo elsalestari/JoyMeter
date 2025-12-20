@@ -63,6 +63,9 @@
                     <span class="text-xl font-semibold text-green-900">{{ number_format($stats['senang_rate'], 1) }}%</span>
                 </div>
             </div>
+            <div class="mt-4 text-xs text-green-600 bg-green-50 rounded p-2 border border-green-200">
+                <div class="font-medium mb-1">📊 Satisfaction Score: ≥ 80</div>
+            </div>
         </div>
 
         <!-- Netral -->
@@ -81,6 +84,9 @@
                     <span class="text-xl font-semibold text-yellow-900">{{ number_format($stats['netral_rate'], 1) }}%</span>
                 </div>
             </div>
+            <div class="mt-4 text-xs text-yellow-600 bg-yellow-50 rounded p-2 border border-yellow-200">
+                <div class="font-medium mb-1">📊 Satisfaction Score: 45 - 79</div>
+            </div>
         </div>
 
         <!-- Tidak Puas -->
@@ -98,6 +104,9 @@
                     <span class="text-sm text-red-700">Persentase</span>
                     <span class="text-xl font-semibold text-red-900">{{ number_format($stats['tidak_puas_rate'], 1) }}%</span>
                 </div>
+            </div>
+            <div class="mt-4 text-xs text-red-600 bg-red-50 rounded p-2 border border-red-200">
+                <div class="font-medium mb-1">📊 Satisfaction Score: &lt; 45</div>
             </div>
         </div>
     </div>
@@ -144,63 +153,70 @@
         </div>
     </div>
 
-    <!-- Tabel Riwayat Kepuasan per Hari (maksimal 20 hari terakhir) -->
+    <!-- Tabel Data Pelanggan Individual -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Riwayat Kepuasan Pelanggan per Hari</h3>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Data Kepuasan Pelanggan</h3>
+                <p class="text-xs text-gray-500 mt-1">Pelanggan 1 = data paling lama | Urutan tabel: Terbaru di atas, Terlama di bawah</p>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pelanggan</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Senang</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Netral</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Tidak Puas</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Tingkat Kepuasan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal & Waktu</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Session ID</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ekspresi Dominan</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Durasi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($dailyHistory as $day)
-                    <tr>
+                    @forelse($customerList as $customer)
+                    <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-medium text-gray-900">{{ $day['date'] }}</span>
+                            <span class="text-sm font-medium text-gray-900">Pelanggan {{ $customer['number'] }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ $customer['date'] }}</div>
+                            <div class="text-xs text-gray-500">{{ $customer['time'] }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="text-sm font-semibold text-gray-900">{{ number_format($day['total']) }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {{ number_format($day['senang']) }}
+                            <span class="text-xs font-mono text-gray-500" title="{{ $customer['session_id'] }}">
+                                {{ substr($customer['session_id'], 0, 12) }}...
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                {{ number_format($day['netral']) }}
+                            <span class="text-sm font-bold text-gray-900">{{ $customer['satisfaction_score'] }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full {{ $customer['color_class'] }}">
+                                <span>{{ $customer['emoji'] }}</span>
+                                <span>{{ $customer['category'] }}</span>
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                {{ number_format($day['tidak_puas']) }}
-                            </span>
+                            <span class="text-sm text-gray-700">{{ $customer['emotion_label'] }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-sm font-bold text-gray-900">{{ number_format($day['senang_rate'], 1) }}%</span>
-                                <span class="text-xs text-gray-500">Pelanggan Senang</span>
-                            </div>
+                            <span class="text-sm text-gray-500">{{ $customer['duration'] }}s</span>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center">
+                        <td colspan="7" class="px-6 py-8 text-center">
                             <div class="flex flex-col items-center text-gray-400">
                                 <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <p class="text-sm">Belum ada data kepuasan pelanggan dari rekaman kamera</p>
+                                <p class="text-sm mb-2">Belum ada data kepuasan pelanggan</p>
+                                <a href="{{ route('camera.session') }}" class="text-xs text-[#F6821F] hover:underline">
+                                    Mulai Sesi Kamera →
+                                </a>
                             </div>
                         </td>
                     </tr>

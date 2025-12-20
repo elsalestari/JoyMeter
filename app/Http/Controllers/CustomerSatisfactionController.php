@@ -33,12 +33,14 @@ class CustomerSatisfactionController extends Controller
         $satisfactionData = $this->getSatisfactionTrendData($startDate, $endDate);
         $categoryDistribution = $this->getCategoryDistribution($startDate, $endDate);
         $dailyHistory = $this->getDailySatisfactionHistory($startDate, $endDate);
+        $customerList = $this->getCustomerList($startDate, $endDate);
 
-        return view('customer_satisfaction', compact(
+        return view('customer-satisfaction.index', compact(
             'stats',
             'satisfactionData',
             'categoryDistribution',
             'dailyHistory',
+            'customerList',
             'startDate',
             'endDate'
         ));
@@ -49,30 +51,51 @@ class CustomerSatisfactionController extends Controller
      */
     public function exportPdf(Request $request)
     {
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
+        try {
+            $startDate = $request->get('start_date');
+            $endDate = $request->get('end_date');
 
-        $stats = $this->getStatistics($startDate, $endDate);
-        $satisfactionData = $this->getSatisfactionTrendData($startDate, $endDate);
-        $categoryDistribution = $this->getCategoryDistribution($startDate, $endDate);
-        $dailyHistory = $this->getDailySatisfactionHistory($startDate, $endDate);
+            $stats = $this->getStatistics($startDate, $endDate);
+            $satisfactionData = $this->getSatisfactionTrendData($startDate, $endDate);
+            $categoryDistribution = $this->getCategoryDistribution($startDate, $endDate);
+            $dailyHistory = $this->getDailySatisfactionHistory($startDate, $endDate);
+            $customerList = $this->getCustomerList($startDate, $endDate);
 
-        $pdf = Pdf::loadView('customer_satisfaction_pdf', compact(
-            'stats',
-            'satisfactionData',
-            'categoryDistribution',
-            'dailyHistory',
-            'startDate',
-            'endDate'
-        ));
+            $pdf = Pdf::loadView('customer-satisfaction.pdf', compact(
+                'stats',
+                'satisfactionData',
+                'categoryDistribution',
+                'dailyHistory',
+                'customerList',
+                'startDate',
+                'endDate'
+            ));
 
-        $fileName = 'laporan-kepuasan-pelanggan-' . now()->format('Ymd_His') . '.pdf';
+            $pdf->setPaper('A4', 'portrait');
+            
+            $pdf->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => false,
+                'defaultFont' => 'DejaVu Sans',
+                'enable_php' => false,
+            ]);
 
-        return $pdf->download($fileName);
+            $fileName = 'Laporan-Kepuasan-Pelanggan-' . now()->format('Ymd-His') . '.pdf';
+
+            return $pdf->download($fileName);
+            
+        } catch (\Exception $e) {
+            \Log::error('PDF Export Error: ' . $e->getMessage());
+            
+            return redirect()->back()->with('error', 'Gagal mengekspor PDF: ' . $e->getMessage());
+        }
     }
 
     /**
      * Summary statistics on customer satisfaction
+     * - Senang: ≥ 80 (very happy, big smile)
+     * - Netral: 45-79 (slight smile)
+     * - Tidak Puas: < 45 (flat face)
      */
     private function getStatistics(?string $startDate, ?string $endDate): array
     {
@@ -87,10 +110,9 @@ class CustomerSatisfactionController extends Controller
 
         $total = $query->count();
 
-        // Kategori berdasarkan nilai satisfaction (0-100)
-        $senang = (clone $query)->where('satisfaction', '>=', 70)->count();
-        $netral = (clone $query)->whereBetween('satisfaction', [40, 69])->count();
-        $tidakPuas = (clone $query)->where('satisfaction', '<', 40)->count();
+        $senang = (clone $query)->where('satisfaction', '>=', 80)->count();
+        $netral = (clone $query)->whereBetween('satisfaction', [45, 79])->count();
+        $tidakPuas = (clone $query)->where('satisfaction', '<', 45)->count();
 
         $senangRate = $total > 0 ? ($senang / $total) * 100 : 0;
         $netralRate = $total > 0 ? ($netral / $total) * 100 : 0;
@@ -108,12 +130,14 @@ class CustomerSatisfactionController extends Controller
     }
 
     /**
-     * Satisfaction trend data (percentage of Satisfied per period)
+     * Satisfaction trend data (count of each category per period)
      */
     private function getSatisfactionTrendData(?string $startDate, ?string $endDate): array
     {
         $labels = [];
-        $senangRates = [];
+        $senangCounts = [];
+        $netralCounts = [];
+        $tidakPuasCounts = [];
 
         if ($startDate && $endDate) {
             $start = Carbon::parse($startDate);
@@ -121,32 +145,45 @@ class CustomerSatisfactionController extends Controller
             $daysDiff = $start->diffInDays($end);
 
             if ($daysDiff > 30) {
+                // Monthly data
                 $current = $start->copy()->startOfMonth();
                 while ($current <= $end) {
                     $labels[] = $current->format('M Y');
 
                     $monthQuery = CustomerExpression::whereYear('ended_at', $current->year)
                         ->whereMonth('ended_at', $current->month);
-                    $total = $monthQuery->count();
-                    $senang = $monthQuery->where('satisfaction', '>=', 70)->count();
+                    
+                    $senang = (clone $monthQuery)->where('satisfaction', '>=', 80)->count();
+                    $netral = (clone $monthQuery)->whereBetween('satisfaction', [45, 79])->count();
+                    $tidakPuas = (clone $monthQuery)->where('satisfaction', '<', 45)->count();
 
-                    $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
+                    $senangCounts[] = $senang;
+                    $netralCounts[] = $netral;
+                    $tidakPuasCounts[] = $tidakPuas;
+                    
                     $current->addMonth();
                 }
             } else {
+                // Daily data
                 $current = $start->copy();
                 while ($current <= $end) {
                     $labels[] = $current->format('d M');
 
                     $dayQuery = CustomerExpression::whereDate('ended_at', $current->toDateString());
-                    $total = $dayQuery->count();
-                    $senang = $dayQuery->where('satisfaction', '>=', 70)->count();
+                    
+                    $senang = (clone $dayQuery)->where('satisfaction', '>=', 80)->count();
+                    $netral = (clone $dayQuery)->whereBetween('satisfaction', [45, 79])->count();
+                    $tidakPuas = (clone $dayQuery)->where('satisfaction', '<', 45)->count();
 
-                    $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
+                    $senangCounts[] = $senang;
+                    $netralCounts[] = $netral;
+                    $tidakPuasCounts[] = $tidakPuas;
+                    
                     $current->addDay();
                 }
             }
         } else {
+            // All-time monthly data
             $firstRecord = CustomerExpression::orderBy('ended_at', 'asc')->first();
 
             if ($firstRecord) {
@@ -159,18 +196,31 @@ class CustomerSatisfactionController extends Controller
 
                     $monthQuery = CustomerExpression::whereYear('ended_at', $current->year)
                         ->whereMonth('ended_at', $current->month);
-                    $total = $monthQuery->count();
-                    $senang = $monthQuery->where('satisfaction', '>=', 70)->count();
+                    
+                    $senang = (clone $monthQuery)->where('satisfaction', '>=', 80)->count();
+                    $netral = (clone $monthQuery)->whereBetween('satisfaction', [45, 79])->count();
+                    $tidakPuas = (clone $monthQuery)->where('satisfaction', '<', 45)->count();
 
-                    $senangRates[] = $total > 0 ? round(($senang / $total) * 100, 1) : 0;
+                    $senangCounts[] = $senang;
+                    $netralCounts[] = $netral;
+                    $tidakPuasCounts[] = $tidakPuas;
+                    
                     $current->addMonth();
                 }
             }
         }
 
+        $senangRates = [];
+        foreach ($senangCounts as $index => $senangCount) {
+            $total = $senangCounts[$index] + $netralCounts[$index] + $tidakPuasCounts[$index];
+            $senangRates[] = $total > 0 ? round(($senangCount / $total) * 100, 1) : 0;
+        }
+
         return [
             'labels' => $labels,
-            'senang_rates' => $senangRates,
+            'senang_rates' => $senangRates, 
+            'senang_counts' => $senangCounts, 
+            'netral_counts' => $netralCounts, 
         ];
     }
 
@@ -197,9 +247,9 @@ class CustomerSatisfactionController extends Controller
             ];
         }
 
-        $senang = (clone $query)->where('satisfaction', '>=', 70)->count();
-        $netral = (clone $query)->whereBetween('satisfaction', [40, 69])->count();
-        $tidakPuas = (clone $query)->where('satisfaction', '<', 40)->count();
+        $senang = (clone $query)->where('satisfaction', '>=', 80)->count();
+        $netral = (clone $query)->whereBetween('satisfaction', [45, 79])->count();
+        $tidakPuas = (clone $query)->where('satisfaction', '<', 45)->count();
 
         return [
             'labels' => ['Senang', 'Netral', 'Tidak Puas'],
@@ -228,9 +278,9 @@ class CustomerSatisfactionController extends Controller
         $rows = $query
             ->selectRaw('DATE(ended_at) as date')
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw("SUM(CASE WHEN satisfaction >= 70 THEN 1 ELSE 0 END) as senang")
-            ->selectRaw("SUM(CASE WHEN satisfaction BETWEEN 40 AND 69 THEN 1 ELSE 0 END) as netral")
-            ->selectRaw("SUM(CASE WHEN satisfaction < 40 THEN 1 ELSE 0 END) as tidak_puas")
+            ->selectRaw("SUM(CASE WHEN satisfaction >= 80 THEN 1 ELSE 0 END) as senang")
+            ->selectRaw("SUM(CASE WHEN satisfaction BETWEEN 45 AND 79 THEN 1 ELSE 0 END) as netral")
+            ->selectRaw("SUM(CASE WHEN satisfaction < 45 THEN 1 ELSE 0 END) as tidak_puas")
             ->groupBy(DB::raw('DATE(ended_at)'))
             ->orderByDesc('date')
             ->limit(20)
@@ -249,5 +299,60 @@ class CustomerSatisfactionController extends Controller
                 'senang_rate' => $senangRate,
             ];
         })->toArray();
+    }
+
+    /**
+     * Get individual customer list with details
+     */
+    private function getCustomerList(?string $startDate, ?string $endDate): array
+    {
+        $query = CustomerExpression::query();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('ended_at', [
+                Carbon::parse($startDate)->startOfDay(),
+                Carbon::parse($endDate)->endOfDay(),
+            ]);
+        }
+
+        $customers = $query
+            ->orderBy('ended_at', 'asc') 
+            ->limit(50) 
+            ->get();
+
+        $customerList = $customers->map(function ($customer, $index) {
+            if ($customer->satisfaction >= 80) {
+                $category = 'Senang';
+                $emoji = '😊';
+                $colorClass = 'bg-green-100 text-green-800';
+            } elseif ($customer->satisfaction >= 45) {
+                $category = 'Netral';
+                $emoji = '😐';
+                $colorClass = 'bg-yellow-100 text-yellow-800';
+            } else {
+                $category = 'Tidak Puas';
+                $emoji = '😞';
+                $colorClass = 'bg-red-100 text-red-800';
+            }
+
+            return [
+                'number' => $index + 1, 
+                'session_id' => $customer->session_id,
+                'date' => $customer->ended_at->format('d M Y'),
+                'time' => $customer->ended_at->format('H:i:s'),
+                'satisfaction_score' => $customer->satisfaction,
+                'category' => $category,
+                'emoji' => $emoji,
+                'color_class' => $colorClass,
+                'dominant_emotion' => $customer->dominant_emotion,
+                'emotion_label' => $customer->emotion_label,
+                'duration' => $customer->started_at && $customer->ended_at 
+                    ? $customer->started_at->diffInSeconds($customer->ended_at) 
+                    : 0,
+                'notes' => $customer->notes,
+            ];
+        })->toArray();
+
+        return array_reverse($customerList, false);
     }
 }
