@@ -63,7 +63,7 @@
                     </div>
                     <div class="ml-3 flex-1">
                         <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-500 capitalize">{{ auth()->user()->role }}</p>
+                        <p class="text-xs text-gray-500">{{ auth()->user()->role_display_name }}</p>
                     </div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
@@ -120,8 +120,8 @@
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</p>
                                             <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
-                                            <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full {{ auth()->user()->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }} capitalize">
-                                                {{ auth()->user()->role === 'staff' ? 'Karyawan' : ucfirst(auth()->user()->role) }}
+                                            <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full {{ auth()->user()->role_badge_classes }}">
+                                                {{ auth()->user()->role_display_name }}
                                             </span>
                                         </div>
                                     </div>

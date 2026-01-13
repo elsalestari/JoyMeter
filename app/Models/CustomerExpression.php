@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
 
 class CustomerExpression extends Model
 {
@@ -13,73 +15,148 @@ class CustomerExpression extends Model
         'satisfaction',
         'started_at',
         'ended_at',
-        'notes',
+        'notes'
     ];
 
     protected $casts = [
         'avg_scores' => 'array',
+        'satisfaction' => 'integer',
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
     ];
 
     /**
-     * Get satisfaction category based on dominant emotion
-     * - Happy → Senang
-     * - Neutral → Netral
-     * - Others (Sad/Angry/Fearful/Disgusted/Surprised) → Tidak Puas
+     * Scope untuk filter berdasarkan range tanggal
+     */
+    public function scopeDateRange(Builder $query, ?string $startDate, ?string $endDate): Builder
+    {
+        if ($startDate && $endDate) {
+            return $query->whereBetween('ended_at', [
+                Carbon::parse($startDate)->startOfDay(),
+                Carbon::parse($endDate)->endOfDay(),
+            ]);
+        }
+        
+        return $query;
+    }
+
+    /**
+     * Scope untuk kategori SENANG
+     */
+    public function scopeSenang(Builder $query): Builder
+    {
+        $min = config('satisfaction.ranges.senang.min');
+        return $query->where('satisfaction', '>=', $min);
+    }
+
+    /**
+     * Scope untuk kategori NETRAL
+     */
+    public function scopeNetral(Builder $query): Builder
+    {
+        $min = config('satisfaction.ranges.netral.min');
+        $max = config('satisfaction.ranges.netral.max');
+        return $query->whereBetween('satisfaction', [$min, $max]);
+    }
+
+    /**
+     * Scope untuk kategori TIDAK PUAS
+     */
+    public function scopeTidakPuas(Builder $query): Builder
+    {
+        $max = config('satisfaction.ranges.tidak_puas.max');
+        return $query->where('satisfaction', '<=', $max);
+    }
+
+    /**
+     * Get kategori kepuasan berdasarkan score
      */
     public function getSatisfactionCategoryAttribute(): string
     {
-        return match($this->dominant_emotion) {
-            'happy' => 'Senang',
-            'neutral' => 'Netral',
-            default => 'Tidak Puas', 
-        };
+        $ranges = config('satisfaction.ranges');
+        
+        if ($this->satisfaction >= $ranges['senang']['min']) {
+            return 'Senang';
+        } elseif ($this->satisfaction >= $ranges['netral']['min']) {
+            return 'Netral';
+        } else {
+            return 'Tidak Puas';
+        }
     }
 
     /**
-     * Get emoji for satisfaction category based on dominant emotion
+     * Get emoji berdasarkan kategori
      */
     public function getCategoryEmojiAttribute(): string
     {
-        return match($this->dominant_emotion) {
-            'happy' => '😊',
-            'neutral' => '😐',
-            default => '😞', 
-        };
+        $ranges = config('satisfaction.ranges');
+        $emojis = config('satisfaction.emojis');
+        
+        if ($this->satisfaction >= $ranges['senang']['min']) {
+            return $emojis['senang'];
+        } elseif ($this->satisfaction >= $ranges['netral']['min']) {
+            return $emojis['netral'];
+        } else {
+            return $emojis['tidak_puas'];
+        }
     }
 
     /**
-     * Get human-readable emotion label
+     * Get badge class berdasarkan kategori
+     */
+    public function getCategoryBadgeClassAttribute(): string
+    {
+        $ranges = config('satisfaction.ranges');
+        $classes = config('satisfaction.badge_classes');
+        
+        if ($this->satisfaction >= $ranges['senang']['min']) {
+            return $classes['senang'];
+        } elseif ($this->satisfaction >= $ranges['netral']['min']) {
+            return $classes['netral'];
+        } else {
+            return $classes['tidak_puas'];
+        }
+    }
+
+    /**
+     * Get label ekspresi dominan
      */
     public function getEmotionLabelAttribute(): string
     {
-        return match($this->dominant_emotion) {
-            'happy' => 'Senang',
-            'sad' => 'Sedih',
-            'angry' => 'Marah',
-            'surprised' => 'Terkejut',
-            'neutral' => 'Netral',
-            'fear' => 'Takut',
-            'disgust' => 'Jijik',
-            default => 'Tidak Diketahui',
-        };
+        $expressions = config('satisfaction.expressions');
+        
+        if (isset($expressions[$this->dominant_emotion])) {
+            return $expressions[$this->dominant_emotion]['label'];
+        }
+        
+        return ucfirst($this->dominant_emotion ?? 'Unknown');
     }
 
     /**
-     * Get emoji for emotion
+     * Get emoji ekspresi dominan
      */
     public function getEmotionEmojiAttribute(): string
     {
-        return match($this->dominant_emotion) {
-            'happy' => '😊',
-            'sad' => '😢',
-            'angry' => '😠',
-            'surprised' => '😲',
-            'neutral' => '😐',
-            'fear' => '😨',
-            'disgust' => '🤢',
-            default => '😐',
-        };
+        $expressions = config('satisfaction.expressions');
+        
+        if (isset($expressions[$this->dominant_emotion])) {
+            return $expressions[$this->dominant_emotion]['emoji'];
+        }
+        
+        return '😐';
+    }
+
+    /**
+     * Get sentiment dari ekspresi dominan
+     */
+    public function getEmotionSentimentAttribute(): string
+    {
+        $expressions = config('satisfaction.expressions');
+        
+        if (isset($expressions[$this->dominant_emotion])) {
+            return $expressions[$this->dominant_emotion]['sentiment'];
+        }
+        
+        return 'neutral';
     }
 }

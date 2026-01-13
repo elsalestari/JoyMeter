@@ -37,7 +37,7 @@
             </form>
 
             <!-- Tombol Tambah (Hanya Admin) -->
-            @if(auth()->user()->role === 'admin')
+            @if(auth()->user()->isAdmin())
             <a href="{{ route('staff.create') }}" 
                class="px-6 py-2 bg-gradient-to-r from-[#F7AA4A] to-[#F6821F] text-white rounded-md hover:shadow-lg transition-all text-sm font-medium flex items-center justify-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +105,7 @@
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Peran</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Terdaftar</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktivitas Terakhir</th>
-                        @if(auth()->user()->role === 'admin')
+                        @if(auth()->user()->isAdmin())
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         @endif
                     </tr>
@@ -130,21 +130,10 @@
                             <div class="text-sm text-gray-900">{{ $user->email }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            @if($user->role === 'admin')
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 capitalize">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                Admin
+                            <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full {{ $user->role_badge_classes }}">
+                                <span class="mr-1">{{ $user->role_emoji }}</span>
+                                {{ $user->role_display_name }}
                             </span>
-                            @else
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 capitalize">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                </svg>
-                                Karyawan
-                            </span>
-                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">{{ $user->created_at->format('d M Y') }}</div>
@@ -154,7 +143,7 @@
                             <div class="text-sm text-gray-900">{{ $user->updated_at->diffForHumans() }}</div>
                             <div class="text-xs text-gray-500">{{ $user->updated_at->format('d M Y, H:i') }}</div>
                         </td>
-                        @if(auth()->user()->role === 'admin')
+                        @if(auth()->user()->isAdmin())
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('staff.edit', $user) }}" 
@@ -186,7 +175,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="{{ auth()->user()->role === 'admin' ? '6' : '5' }}" class="px-6 py-8 text-center">
+                        <td colspan="{{ auth()->user()->isAdmin() ? '6' : '5' }}" class="px-6 py-8 text-center">
                             <div class="flex flex-col items-center text-gray-400">
                                 <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

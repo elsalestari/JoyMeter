@@ -21,9 +21,9 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
             ],
             [
-                'name' => 'Staff JoyMeter',
-                'email' => 'staff@joymeter.test',
-                'password' => Hash::make('staff123'),
+                'name' => 'Karyawan JoyMeter',
+                'email' => 'karyawan@joymeter.test',
+                'password' => Hash::make('karyawan123'),
                 'role' => 'staff',
             ],
         ];

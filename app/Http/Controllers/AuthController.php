@@ -49,7 +49,7 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        if (!in_array($user->role, self::ALLOWED_ROLES, true)) {
+        if (!$user->hasRole(self::ALLOWED_ROLES)) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -61,7 +61,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $intendedUrl = $request->session()->pull('url.intended', $this->getRedirectUrl($user->role));
+        $intendedUrl = $request->session()->pull('url.intended', $this->getRedirectUrl($user));
 
         return redirect()->to($intendedUrl)->with('success', 'Selamat datang, ' . $user->name . '!');
     }
@@ -84,12 +84,12 @@ class AuthController extends Controller
     /**
      * Get redirect URL based on user role.
      */
-    private function getRedirectUrl(string $role): string
+    private function getRedirectUrl($user): string
     {
-        return match($role) {
-            'admin' => route('dashboard'),
-            'staff' => route('dashboard'),
-            default => route('login'),
-        };
+        if ($user->canAccessCamera()) {
+            return route('dashboard');
+        }
+
+        return route('login');
     }
 }

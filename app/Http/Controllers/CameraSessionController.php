@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerExpression;
-use Illuminate\Http\Request;
+use App\Services\ExpressionAnalysisService;
+use App\Http\Requests\SaveExpressionRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 class CameraSessionController extends Controller
 {
-    /**
-     * Apply middleware to restrict access
-     */
-    public function __construct()
+    protected ExpressionAnalysisService $expressionService;
+
+    public function __construct(ExpressionAnalysisService $expressionService)
     {
         $this->middleware(['auth', 'role:staff,admin']);
+        $this->expressionService = $expressionService;
     }
 
     /**
@@ -24,93 +24,34 @@ class CameraSessionController extends Controller
      */
     public function show(): View
     {
-        return view('camera.session');
+        $sessionId = $this->expressionService->generateSessionId();
+        
+        return view('camera.session', compact('sessionId'));
     }
 
     /**
      * Save facial expression data from camera
      */
-    public function saveExpression(Request $request): JsonResponse
+    public function saveExpression(SaveExpressionRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'session_id' => 'required|string|max:255',
-            'expressions' => 'required|array',
-            'expressions.happy' => 'required|numeric|min:0|max:1',
-            'expressions.sad' => 'required|numeric|min:0|max:1',
-            'expressions.angry' => 'required|numeric|min:0|max:1',
-            'expressions.surprised' => 'required|numeric|min:0|max:1',
-            'expressions.neutral' => 'required|numeric|min:0|max:1',
-            'expressions.fearful' => 'required|numeric|min:0|max:1',
-            'expressions.disgusted' => 'required|numeric|min:0|max:1',
-            'started_at' => 'required|date',
-            'ended_at' => 'nullable|date|after:started_at',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
-            $expressions = $request->expressions;
-            
-            // Calculate dominant emotion
-            $dominantEmotion = $this->getDominantEmotion($expressions);
-            
-            // Calculate satisfaction score (0-100)
-            $satisfactionScore = $this->calculateSatisfaction($expressions);
-            
-            // Prepare avg_scores untuk database
-            $avgScores = [
-                'happy' => round($expressions['happy'], 4),
-                'sad' => round($expressions['sad'], 4),
-                'angry' => round($expressions['angry'], 4),
-                'surprised' => round($expressions['surprised'], 4),
-                'neutral' => round($expressions['neutral'], 4),
-                'fear' => round($expressions['fearful'], 4),
-                'disgust' => round($expressions['disgusted'], 4),
-            ];
-            
-            // Create or update customer expression
-            $customerExpression = CustomerExpression::updateOrCreate(
-                ['session_id' => $request->session_id],
-                [
-                    'avg_scores' => $avgScores,
-                    'dominant_emotion' => $dominantEmotion,
-                    'satisfaction' => $satisfactionScore,
-                    'started_at' => Carbon::parse($request->started_at),
-                    'ended_at' => $request->ended_at ? Carbon::parse($request->ended_at) : Carbon::now(),
-                    'notes' => 'Captured via camera - Staff: ' . auth()->user()->name,
-                ]
+            $result = $this->expressionService->processAndSaveExpression(
+                $request->validated()
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Expression data saved successfully',
-                'data' => [
-                    'id' => $customerExpression->id,
-                    'session_id' => $customerExpression->session_id,
-                    'dominant_emotion' => $dominantEmotion,
-                    'satisfaction_score' => $satisfactionScore,
-                    'satisfaction_category' => $customerExpression->satisfaction_category,
-                    'category_emoji' => $customerExpression->category_emoji,
-                ]
-            ], 200);
+            return response()->json($result, 200);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to save expression data',
-                'error' => $e->getMessage()
+                'message' => 'Gagal menyimpan data ekspresi',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
     }
 
     /**
-     * Get active camera sessions
+     * Get active camera sessions (last 24 hours)
      */
     public function activeSessions(): JsonResponse
     {
@@ -139,57 +80,42 @@ class CameraSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch sessions',
-                'error' => $e->getMessage()
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
     }
 
     /**
-     * Get dominant emotion from expression scores
+     * Get session statistics
      */
-    private function getDominantEmotion(array $expressions): string
+    public function sessionStats(): JsonResponse
     {
-        $emotionMap = [
-            'happy' => 'happy',
-            'sad' => 'sad',
-            'angry' => 'angry',
-            'surprised' => 'surprised',
-            'neutral' => 'neutral',
-            'fearful' => 'fear',
-            'disgusted' => 'disgust',
-        ];
+        try {
+            $today = Carbon::today();
+            
+            $stats = [
+                'today' => CustomerExpression::whereDate('created_at', $today)->count(),
+                'this_week' => CustomerExpression::whereBetween('created_at', [
+                    Carbon::now()->startOfWeek(),
+                    Carbon::now()->endOfWeek()
+                ])->count(),
+                'this_month' => CustomerExpression::whereMonth('created_at', $today->month)
+                    ->whereYear('created_at', $today->year)
+                    ->count(),
+                'average_satisfaction' => CustomerExpression::whereDate('created_at', $today)
+                    ->avg('satisfaction') ?? 0,
+            ];
 
-        $maxScore = 0;
-        $dominantEmotion = 'neutral';
-
-        foreach ($expressions as $emotion => $score) {
-            if ($score > $maxScore) {
-                $maxScore = $score;
-                $dominantEmotion = $emotionMap[$emotion] ?? 'neutral';
-            }
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch statistics',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
         }
-
-        return $dominantEmotion;
-    }
-
-    /**
-     * Calculate satisfaction score (0-100) based on emotion weights
-     * - Senang: ≥ 80 (very happy, big smile with teeth showing)
-     * - Netral: 45-79 (slight smile, no teeth showing)
-     * - Tidak Puas: < 45 (flat face, no smile)
-     */
-    private function calculateSatisfaction(array $expressions): int
-    {
-        $satisfaction = (
-            ($expressions['happy'] * 120) +           
-            ($expressions['surprised'] * 60) +      
-            ($expressions['neutral'] * 25) +         
-            ($expressions['sad'] * 15) +              
-            ($expressions['fearful'] * 10) +          
-            ($expressions['angry'] * 5) +             
-            ($expressions['disgusted'] * 3)           
-        );
-
-        return min(100, max(0, (int) round($satisfaction)));
     }
 }

@@ -15,8 +15,9 @@
                     <h2 class="text-2xl font-bold mb-2">{{ $user->name }}</h2>
                     <p class="text-white/90 mb-3">{{ $user->email }}</p>
                     <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium capitalize">
-                            {{ $user->role === 'staff' ? 'Karyawan' : ucfirst($user->role) }}
+                        <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium flex items-center gap-1">
+                            <span>{{ $user->role_emoji }}</span>
+                            <span>{{ $user->role_display_name }}</span>
                         </span>
                         <span class="text-sm text-white/80">
                             Bergabung {{ $user->created_at->diffForHumans() }}
@@ -51,8 +52,8 @@
                 <p class="text-sm text-gray-500 mt-1">{{ $stats['last_login']->format('d M Y, H:i') }}</p>
             </div>
 
-            <!-- Tiket Support -->
-            @if($user->role === 'staff')
+            <!-- Tiket Support atau Status Akun -->
+            @if($user->isStaff())
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-500">Tiket Terbuka</h3>
@@ -102,9 +103,10 @@
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-500">Peran</label>
-                        <p class="text-base text-gray-900 mt-1 capitalize">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
-                                {{ $user->role === 'staff' ? 'Karyawan' : ucfirst($user->role) }}
+                        <p class="text-base text-gray-900 mt-1">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $user->role_badge_classes }} gap-1">
+                                <span>{{ $user->role_emoji }}</span>
+                                <span>{{ $user->role_display_name }}</span>
                             </span>
                         </p>
                     </div>

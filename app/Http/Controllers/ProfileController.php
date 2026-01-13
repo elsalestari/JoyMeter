@@ -32,7 +32,7 @@ class ProfileController extends Controller
             'last_login' => $user->updated_at,
         ];
         
-        if ($user->role === 'staff') {
+        if ($user->isStaff()) {
             $stats['open_tickets'] = \App\Models\SupportTicket::where('user_id', $user->id)
                 ->where('status', 'open')
                 ->count();

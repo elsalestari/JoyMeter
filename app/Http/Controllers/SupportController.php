@@ -20,17 +20,16 @@ class SupportController extends Controller
 
     /**
      * Display support dashboard
-     * Routes to different views based on role
      */
     public function index(): View
     {
         $user = Auth::user();
         
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             // Admin: lihat semua tiket dari karyawan
             $tickets = SupportTicket::with('user')
                 ->whereHas('user', function($query) {
-                    $query->where('role', 'staff'); // Hanya tiket dari karyawan
+                    $query->where('role', 'staff');
                 })
                 ->orderBy('created_at', 'desc')
                 ->limit(10)
@@ -54,36 +53,33 @@ class SupportController extends Controller
                     })->count(),
             ];
 
-            // Route ke view admin
             return view('support.admin.index', compact('tickets', 'stats'));
-        } else {
-            // Karyawan: hanya tiket sendiri
-            $tickets = SupportTicket::where('user_id', $user->id)
-                ->orderBy('created_at', 'desc')
-                ->limit(10)
-                ->get();
-            
-            $stats = [
-                'total' => SupportTicket::where('user_id', $user->id)->count(),
-                'open' => SupportTicket::where('user_id', $user->id)->where('status', 'open')->count(),
-                'in_progress' => SupportTicket::where('user_id', $user->id)->where('status', 'in_progress')->count(),
-                'resolved' => SupportTicket::where('user_id', $user->id)->whereIn('status', ['resolved', 'closed'])->count(),
-            ];
-
-            // Route ke view staff
-            return view('support.staff.index', compact('tickets', 'stats'));
         }
+        
+        // Karyawan: hanya tiket sendiri
+        $tickets = SupportTicket::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        
+        $stats = [
+            'total' => SupportTicket::where('user_id', $user->id)->count(),
+            'open' => SupportTicket::where('user_id', $user->id)->where('status', 'open')->count(),
+            'in_progress' => SupportTicket::where('user_id', $user->id)->where('status', 'in_progress')->count(),
+            'resolved' => SupportTicket::where('user_id', $user->id)->whereIn('status', ['resolved', 'closed'])->count(),
+        ];
+
+        return view('support.staff.index', compact('tickets', 'stats'));
     }
 
     /**
      * Show FAQ page
-     * Routes to different views based on role
      */
     public function faq(): View
     {
         $user = Auth::user();
         
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             return view('support.admin.faq');
         }
         
@@ -92,13 +88,12 @@ class SupportController extends Controller
 
     /**
      * Show guides page
-     * Routes to different views based on role
      */
     public function guides(): View
     {
         $user = Auth::user();
         
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             return view('support.admin.guides');
         }
         
@@ -107,13 +102,12 @@ class SupportController extends Controller
 
     /**
      * Show troubleshooting page
-     * Routes to different views based on role
      */
     public function troubleshooting(): View
     {
         $user = Auth::user();
         
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             return view('support.admin.troubleshooting');
         }
         
@@ -128,11 +122,9 @@ class SupportController extends Controller
         $user = Auth::user();
         $query = SupportTicket::with(['user', 'admin']);
 
-        // Filter untuk admin: lihat semua tiket dari karyawan
-        // Filter untuk karyawan: hanya tiket sendiri
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             $query->whereHas('user', function($q) {
-                $q->where('role', 'staff'); // Hanya tiket dari karyawan
+                $q->where('role', 'staff');
             });
         } else {
             $query->where('user_id', $user->id);
@@ -164,12 +156,11 @@ class SupportController extends Controller
     }
 
     /**
-     * Show create ticket form (Hanya Karyawan)
+     * Show create ticket form (karyawan only)
      */
     public function createTicket(): View
     {
-        // Hanya karyawan yang bisa buat tiket
-        if (Auth::user()->role !== 'staff') {
+        if (!Auth::user()->isStaff()) {
             abort(403, 'Hanya karyawan yang dapat membuat tiket support.');
         }
 
@@ -177,12 +168,11 @@ class SupportController extends Controller
     }
 
     /**
-     * Store new ticket (Hanya Karyawan)
+     * Store new ticket (karyawan only)
      */
     public function storeTicket(Request $request): RedirectResponse
     {
-        // Hanya karyawan yang bisa buat tiket
-        if (Auth::user()->role !== 'staff') {
+        if (!Auth::user()->isStaff()) {
             abort(403, 'Hanya karyawan yang dapat membuat tiket support.');
         }
 
@@ -219,14 +209,13 @@ class SupportController extends Controller
      */
     public function showTicket(SupportTicket $ticket): View
     {
-        // Karyawan hanya bisa lihat tiket sendiri
-        // Admin bisa lihat semua tiket dari karyawan
-        if (Auth::user()->role === 'staff' && $ticket->user_id !== Auth::id()) {
+        $user = Auth::user();
+        
+        if ($user->isStaff() && $ticket->user_id !== $user->id) {
             abort(403, 'Anda tidak memiliki akses ke tiket ini.');
         }
 
-        // Admin hanya bisa lihat tiket dari karyawan
-        if (Auth::user()->role === 'admin' && $ticket->user->role !== 'staff') {
+        if ($user->isAdmin() && !$ticket->user->isStaff()) {
             abort(403, 'Tiket ini bukan dari karyawan.');
         }
 
@@ -240,7 +229,7 @@ class SupportController extends Controller
      */
     public function updateStatus(Request $request, SupportTicket $ticket): RedirectResponse
     {
-        if (Auth::user()->role !== 'admin') {
+        if (!Auth::user()->isAdmin()) {
             abort(403);
         }
 
@@ -265,7 +254,7 @@ class SupportController extends Controller
      */
     public function replyTicket(Request $request, SupportTicket $ticket): RedirectResponse
     {
-        if (Auth::user()->role !== 'admin') {
+        if (!Auth::user()->isAdmin()) {
             abort(403);
         }
 
@@ -280,7 +269,6 @@ class SupportController extends Controller
         $ticket->admin_id = Auth::id();
         $ticket->replied_at = now();
         
-        // Auto update status jika masih open
         if ($ticket->status === 'open') {
             $ticket->status = 'in_progress';
         }

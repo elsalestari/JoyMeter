@@ -4,6 +4,10 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+    @php
+        $ranges = config('satisfaction.ranges');
+    @endphp
+
     <!-- Camera Session Button -->
     <div class="bg-gradient-to-r from-[#F7AA4A] via-[#F6821F] to-[#F7AA4A] rounded-lg shadow-lg p-6 mb-6">
         <div class="flex items-center justify-between">
@@ -118,12 +122,12 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1">Kategori Terbanyak</p>
-                    <p class="text-xl font-bold text-gray-900">{{ $dominantExpression['emotion_label'] ?? 'Senang' }}</p>
+                    <p class="text-sm text-gray-500 mb-1">Ekspresi Dominan</p>
+                    <p class="text-xl font-bold text-gray-900">{{ $dominantExpression['emotion_label'] ?? '-' }}</p>
                     <p class="text-xs text-gray-500 mt-1">{{ $dominantExpression['percentage'] ?? 0 }}% ({{ $dominantExpression['count'] ?? 0 }} pelanggan)</p>
                 </div>
-                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-2xl">
-                    {{ $dominantExpression['emotion_emoji'] ?? '😊' }}
+                <div class="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center text-2xl">
+                    {{ $dominantExpression['emotion_emoji'] ?? '😐' }}
                 </div>
             </div>
         </div>
@@ -148,7 +152,7 @@
                 </div>
             </div>
             <div class="mt-4 text-xs text-green-600 bg-green-50 rounded p-2">
-                <div class="font-medium mb-1">📊 Satisfaction Score: ≥ 80</div>
+                <div class="font-medium mb-1">📊 Satisfaction Score: ≥ {{ $ranges['senang']['min'] }}</div>
             </div>
         </div>
 
@@ -169,7 +173,7 @@
                 </div>
             </div>
             <div class="mt-4 text-xs text-yellow-600 bg-yellow-50 rounded p-2">
-                <div class="font-medium mb-1">📊 Satisfaction Score: 45 - 79</div>
+                <div class="font-medium mb-1">📊 Satisfaction Score: {{ $ranges['netral']['min'] }} - {{ $ranges['netral']['max'] }}</div>
             </div>
         </div>
 
@@ -190,7 +194,7 @@
                 </div>
             </div>
             <div class="mt-4 text-xs text-red-600 bg-red-50 rounded p-2">
-                <div class="font-medium mb-1">📊 Satisfaction Score: < 45</div>
+                <div class="font-medium mb-1">📊 Satisfaction Score: < {{ $ranges['netral']['min'] }}</div>
             </div>
         </div>
     </div>
@@ -350,8 +354,8 @@
                             {{ $staff->email }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
-                                {{ $staff->role === 'staff' ? 'Karyawan' : ucfirst($staff->role) }}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $staff->role_badge_classes }}">
+                                {{ $staff->role_display_name }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
